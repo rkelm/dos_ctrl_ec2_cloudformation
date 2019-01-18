@@ -1,3 +1,27 @@
+﻿# To-Do:
+# - Docker Image Ausführung-> ecr login + configure credentials
+#    (I have to use --net=host to enable the access to the metadata service)
+# - Parameter: docker container repository + tag to start (default value?)
+# - Parameter: route 53 subdomain to assign
+# - Load real srvctrl docker image
+# - Parameter: version or link to configuration for container
+# - OnDeleteStack: Save Running Map!
+
+# Test Parameter
+#   - Parameter: docker version with default 1.13/empty
+#   - Parameter: AMI with default value
+#   - yum update?
+#   - Parameter: SSH Key Name, (Optionally autocreate key?)
+#   - Setup cron to install security patches?
+#   - Relogin in to aws ecr, after 11 hours or before loading a new image?
+
+# Add IPv6 support.
+#   - security group
+#   - instance ssh
+#   - MC server
+
+
+OLD To-Do's:
 * dos_ctrl_ec2: Kick funktioniert nicht, weil sich das Fenster schließt bevor der Name eingegeben werden kann?
 
 * Make VolumeId optional.
