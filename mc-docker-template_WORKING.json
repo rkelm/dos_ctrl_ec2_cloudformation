@@ -87,11 +87,11 @@
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
             "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x"
         },
-		"MCPort": {
-			"Description": "TCP port to accept connections to MC Server on.",
-			"Type": "String",
-			"Default": "25565"
-		},
+        "MCPort": {
+            "Description": "TCP port to accept connections to MC Server on.",
+            "Type": "String",
+            "Default": "25565"
+        },
         "DockerVersion": {
             "Description": "Version of Docker engine to install.",
             "Type": "String",
@@ -108,24 +108,38 @@
         "Subdomain": {
             "Description": "Subdomain assigned to instances ip address.",
             "Type": "String"
+        },
+        "ContainerVolumeRoot": {
+            "Description": "Containers path to root with volumes.",
+            "Type": "String",
+            "Default": "/opt/ms_srv_ctrl"
         }
     },
     "Conditions": {
-        "AMIIdGiven" : {
+        "AMIIdGiven": {
             "Fn::Not": [
-                { "Fn::Equals" :
-					[
-						{
-							"Ref": "AMIImageId"
-						},
-						""
-					]
-				}
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "AMIImageId"
+                        },
+                        ""
+                    ]
+                }
             ]
         },
-		"KeyNameGiven" : {
-			"Fn::Not" : [{"Fn::Equals" : ["", {"Ref": "KeyName"}]}]
-		}
+        "KeyNameGiven": {
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        "",
+                        {
+                            "Ref": "KeyName"
+                        }
+                    ]
+                }
+            ]
+        }
     },
     "Mappings": {
         "AWSInstanceType2Arch": {
@@ -372,8 +386,12 @@
                 "SecurityGroupIngress": [
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": { "Ref" : "MCPort" },
-                        "ToPort": { "Ref" : "MCPort" },
+                        "FromPort": {
+                            "Ref": "MCPort"
+                        },
+                        "ToPort": {
+                            "Ref": "MCPort"
+                        },
                         "CidrIp": {
                             "Ref": "MCLocation"
                         }
@@ -413,18 +431,18 @@
                             }
                         },
                         "files": {
-                            "/opt/app/readme.md" : {
-								"content" : {
-									"Fn::Join": [
-										"",
-										[
-											"This file was placed by the Cloud Formation template."
-										]
-									]
-								},
-								"mode": "000600",
-								"owner": "ec2-user",
-								"group": "ec2-user"
+                            "/opt/app/readme.md": {
+                                "content": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "This file was placed by the Cloud Formation template."
+                                        ]
+                                    ]
+                                },
+                                "mode": "000600",
+                                "owner": "ec2-user",
+                                "group": "ec2-user"
                             }
                         },
                         "services": {
@@ -457,93 +475,142 @@
                                         ]
                                     ]
                                 }
+                            },
+                            "03_mkdir_world": {
+                                "command": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "su ec2-user mkdir -p ",
+                                            {
+                                                "Ref": "VolumeMountRoot"
+                                            },
+                                            "/world"
+                                        ]
+                                    ]
+                                }
+                            },
+                            "04_mkdir_logs": {
+                                "command": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "su ec2-user -lc \"docker run hello-world\""
+                                        ]
+                                    ]
+                                }
                             }
                         }
-					},
-					"Run": {
-						"commands" : {
-							"01_ecr_login": {
-								"command": {
-									"Fn::Join": [
-										"",
-										[
-											"$( aws ecr get-login --no-include-email --region ", 
-											{ "Ref" : "AWS::Region" }
-										]
-									]
-								}
-							},
-							"02_run_image": {
-								"command": {
-									"Fn::Join": [
-										"",
-										[
-											"docker run -d -p 22:22 -p 25565:", 
-											{ "Ref" : "MCPort"}, 
-											" -v /var/run/docker.sock:/var/run/docker.sock ", 
-											{ "Ref" : "DockerImage" }
-										]
-									]
-								}
-							}
-						}						
-					}
+                    },
+                    "Run": {
+                        "commands": {
+                            "01_ecr_login": {
+                                "command": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "$( aws ecr get-login --no-include-email --region ",
+                                            {
+                                                "Ref": "AWS::Region"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            },
+                            "02_run_image": {
+                                "command": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "docker run -d -p 22:22 -p 25565:",
+                                            {
+                                                "Ref": "MCPort"
+                                            },
+                                            " --name base-container",
+                                            " --mount source=mc-world,target=",
+                                            {
+                                                "Ref": "ContainerVolumeRoot"
+                                            },
+                                            "/world",
+                                            " --mount source=mc-world,target=",
+                                            {
+                                                "Ref": "ContainerVolumeRoot"
+                                            },
+                                            "/logs",
+                                            " -v /var/run/docker.sock:/var/run/docker.sock ",
+                                            {
+                                                "Ref": "DockerImage"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            }
+                        }
+                    }
                 }
-			},
-			"Properties": {
-				"ImageId": {
-					"Fn::FindInMap": [
-						"AWSRegionArch2AMI",
-						{
-							"Ref": "AWS::Region"
-						},
-						{
-							"Fn::FindInMap": [
-								"AWSInstanceType2Arch",
-								{
-									"Ref": "InstanceType"
-								},
-								"Arch"
-							]
-						}
-					]
-				},
-				"InstanceType": {
-					"Ref": "InstanceType"
-				},
-				"SecurityGroups": [
-					{
-						"Ref": "McServerSecurityGroup"
-					}
-				],
-				"KeyName": {
-					"Fn::If": ["KeyNameGiven", {"Ref": "KeyName"}, {"Ref": "AWS::NoValue"}]
-				},
-				"UserData": {
-					"Fn::Base64": {
-						"Fn::Join": [
-							"",
-							[
-								"#!/bin/bash -xe\n",
-								"# yum install -y aws-cfn-bootstrap # Should be preinstalled on current Amazon Linus AMIs.\n",
-								"# Install the files and packages from the metadata\n",
-								"/opt/aws/bin/cfn-init -v ",
-								"         --stack ",
-								{
-									"Ref": "AWS::StackName"
-								},
-								"         --resource McServerInstance ",
-								"         --configsets InstallAndRun ",
-								"         --region ",
-								{
-									"Ref": "AWS::Region"
-								},
-								"\n"
-							]
-						]
-					}
-				}
-			}
+            },
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionArch2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "AWSInstanceType2Arch",
+                                {
+                                    "Ref": "InstanceType"
+                                },
+                                "Arch"
+                            ]
+                        }
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "McServerSecurityGroup"
+                    }
+                ],
+                "KeyName": {
+                    "Fn::If": [
+                        "KeyNameGiven",
+                        {
+                            "Ref": "KeyName"
+                        },
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -xe\n",
+                                "# yum install -y aws-cfn-bootstrap # Should be preinstalled on current Amazon Linus AMIs.\n",
+                                "# Install the files and packages from the metadata\n",
+                                "/opt/aws/bin/cfn-init -v ",
+                                "         --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "         --resource McServerInstance ",
+                                "         --configsets InstallAndRun ",
+                                "         --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n"
+                            ]
+                        ]
+                    }
+                }
+            }
         }
     },
     "Outputs": {
