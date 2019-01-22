@@ -1,11 +1,16 @@
 ﻿# To-Do:
 # - Docker Image Ausführung-> ecr login + configure credentials
 #    (I have to use --net=host to enable the access to the metadata service)
-# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:1.13.2
+
 # - Parameter: docker container repository + tag to start (default value?)
 # - Parameter: route 53 subdomain to assign
 # - Load real srvctrl docker image
 # - Parameter: version or link to configuration for container
+# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:1.13.2
+# mc-host-cf.ps-ev.de.
+
+
+#
 # - OnDeleteStack: Save Running Map!
 
 # Test parameter

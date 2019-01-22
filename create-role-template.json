@@ -1,0 +1,19 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Runs an ec2 instance with a DOOD (Docker out of Docker) Docker container to control host's docker daemon from within a docker container.",
+    "Resources": {
+        "MCDockerRunner": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": { JSON
+                },
+                "ManagedPolicyArns": [ String, ...
+                ],
+                "Path": String,
+                "Policies": [ Policies, ...
+                ],
+                "RoleName": String
+            }
+        }
+    }
+}

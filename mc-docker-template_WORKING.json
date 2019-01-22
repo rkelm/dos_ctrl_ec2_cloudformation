@@ -105,9 +105,10 @@
             "Description": "ImageID of AMI to run on ec2 instance.",
             "Type": "String"
         },
-        "Subdomain": {
-            "Description": "Subdomain assigned to instances ip address.",
-            "Type": "String"
+        "HostSubdomain": {
+            "Description": "Name of route53 recordset to assign to instance's public ip address. (Needs a dot at the end.)",
+            "Type": "String",
+            "Default": "."
         },
         "ContainerVolumeRoot": {
             "Description": "Containers path to root with volumes.",
@@ -475,30 +476,6 @@
                                         ]
                                     ]
                                 }
-                            },
-                            "03_mkdir_world": {
-                                "command": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "su ec2-user mkdir -p ",
-                                            {
-                                                "Ref": "VolumeMountRoot"
-                                            },
-                                            "/world"
-                                        ]
-                                    ]
-                                }
-                            },
-                            "04_mkdir_logs": {
-                                "command": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "su ec2-user -lc \"docker run hello-world\""
-                                        ]
-                                    ]
-                                }
                             }
                         }
                     },
@@ -512,7 +489,8 @@
                                             "$( aws ecr get-login --no-include-email --region ",
                                             {
                                                 "Ref": "AWS::Region"
-                                            }
+                                            },
+                                            " )"
                                         ]
                                     ]
                                 }
@@ -610,6 +588,25 @@
                         ]
                     }
                 }
+            }
+        },
+        "HostDNSRecord": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "HostedZoneName": "ps-ev.de.",
+                "Name": {
+                    "Ref": "HostSubdomain"
+                },
+                "Type": "A",
+                "TTL": "60",
+                "ResourceRecords": [
+                    {
+                        "Fn::GetAtt": [
+                            "McServerInstance",
+                            "PublicIp"
+                        ]
+                    }
+                ]
             }
         }
     },
