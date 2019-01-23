@@ -1,0 +1,176 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Resources requiring escalated privileges to create and having low or no costs.",
+    "Parameters": {
+        "MCMapBucketName": {
+            "Description": "The name of the s3 bucket used to store MC maps. It must be created via the console to avoid accidental destruction.",
+            "Type": "String",
+            "Default": "mc-maps"
+        },
+        "MCSNSEmailAddress": {
+            "Description": "Email address to receive status messages from ec2 instance",
+            "Type": "String",
+            "Default": "admin@example.com",
+            "AllowedPattern": "^[\\x20-\\x45]?[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$",
+            "ConstraintDescription": "Valid email adress",
+            "MinLength": "5"
+        }
+    },
+    "Resources": {
+        "MCSNSTopic": {
+            "Type": "AWS::SNS::Topic",
+            "Properties": {
+                "Subscription": [
+                    {
+                        "Endpoint": {
+                            "Ref": "MCSNSEmailAddress"
+                        },
+                        "Protocol": "email"
+                    }
+                ]
+            }
+        },
+        "MCDockerRunnerPolicy": {
+            "Type": "AWS::IAM::ManagedPolicy",
+            "Properties": {
+                "Description": "Customer Managed Policy to MC docker images from ecr plus configuration and data from S3d data.",
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:ListBucket",
+                                "s3:ListBucketVersions",
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "MCMapBucketName"
+                                        }
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:DeleteObject",
+                                "s3:DeleteObjectTagging",
+                                "s3:DeleteObjectVersion",
+                                "s3:DeleteObjectVersionTagging",
+                                "s3:GetObject",
+                                "s3:GetObjectTagging",
+                                "s3:GetObjectVersion",
+                                "s3:GetObjectVersionTagging",
+                                "s3:PutObject",
+                                "s3:PutObjectTagging",
+                                "s3:PutObjectVersion",
+                                "s3:PutObjectVersionTagging"
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "MCMapBucketName"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": "sns:Publish",
+                            "Resource": {
+                                "Ref": "MCSNSTopic"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "MCDockerRunnerRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com",
+                                    "ssm.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+                    {
+                        "Ref": "MCDockerRunnerPolicy"
+                    }
+                ]
+            }
+        },
+        "MCDockerRunnerInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "MCDockerRunnerRole"
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "RoleForMCDockerRunner": {
+            "Description": "Role ID ",
+            "Value": {
+                "Ref": "MCDockerRunnerRole"
+            }
+        },
+        "MapBucketName": {
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "arn:aws:s3:::",
+                        {
+                            "Ref": "MCMapBucketName"
+                        },
+                        "/*"
+                    ]
+                ]
+            }
+        },
+        "SNSTopic": {
+            "Value": {
+                "Ref": "MCSNSTopic"
+            }
+        },
+        "Name": {
+            "Value": {
+                "Fn::Sub": "$AWS::StackName-RoleForMCDockerRunner"
+            }
+        },
+        "ID": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "MCDockerRunnerRole",
+                    "RoleId"
+                ]
+            }
+        }
+    }
+}

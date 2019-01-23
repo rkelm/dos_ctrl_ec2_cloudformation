@@ -1,17 +1,16 @@
 ﻿# To-Do:
+# - CF Run Template 
+	- attach Role
+	- Parameter: route 53 subdomain to assign
+
 # - Docker Image Ausführung-> ecr login + configure credentials
 #    (I have to use --net=host to enable the access to the metadata service)
-
 # - Parameter: docker container repository + tag to start (default value?)
-# - Parameter: route 53 subdomain to assign
 # - Load real srvctrl docker image
 # - Parameter: version or link to configuration for container
+
 # 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:1.13.2
 # mc-host-cf.ps-ev.de.
-
-
-#
-# - OnDeleteStack: Save Running Map!
 
 # Test parameter
 #   - Parameter: docker version with default 1.13/empty
@@ -21,11 +20,16 @@
 #   - Setup cron to install security patches?
 #   - Relogin in to aws ecr, after 11 hours or before loading a new image?
 
+# - OnDeleteStack: Save Running Map!
+
+- Write Setup instructions
+	- Setup ECR
+		- setup resource based policy 
+
 # Add IPv6 support.
 #   - security group
 #   - instance ssh
 #   - MC server
-
 
 OLD To-Do's:
 * dos_ctrl_ec2: Kick funktioniert nicht, weil sich das Fenster schließt bevor der Name eingegeben werden kann?
@@ -53,3 +57,12 @@ OLD To-Do's:
 * Query and show total number of running EC2 instances in launch and terminate BAT files. To ensure overview of total costs. Create STATUS BAT file to show if instance is running?
 * More error checking at instance termination cli calls.
 * Show and save host ssh key for later ssh connection validation.
+
+# - CF Template to create S3 Buckets -> move to overviewer project
+#	- mc-private/maps  (Keep secrets here?)
+#	- mc-render-cache/render-cache
+#	- mc-public/map-renders (Better keep map_ids.txt + configuration in separate Bucket?)
+		- /resource-packs
+		- /index.html
+		- /map_ids.txt
+		- /robots.txt
