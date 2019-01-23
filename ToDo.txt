@@ -1,29 +1,9 @@
 ﻿# To-Do:
 
-# - CF Run Template 
-	- define exportes in setup-template: Rolename, SNS Topic, MapBucketName
-	- attach Profile
-	- Parameter: route 53 subdomain to assign
+- Which values from config.sh must be passed into srv_ctrl container 
+  or preset at build time?
 
-# - Docker Image Ausführung-> ecr login + configure credentials
-#    (I have to use --net=host to enable the access to the metadata service)
-# - Parameter: docker container repository + tag to start (default value?)
-# - Load real srvctrl docker image
-
-Bugs in docker_image_mc_srv_ctrl: -Rebuild
-	- Dockerfile: ms_srv_ctrl -> mc_srv_ctrl
-	- build.sh: INSTALL_PATH env var must be passed to docker build
-	- build.sh: image_info.txt to roofs/ and not to INSTALL_PATH 
-
-# Test parameter
-#   - Parameter: docker version with default 1.13/empty
-#   - Parameter: AMI with default value
-#   - yum update?
-#   - Parameter: SSH Key Name, (Optionally autocreate key?)
-#   - Setup cron to install security patches?
-#   - Relogin in to aws ecr, after 11 hours or before loading a new image?
-
-# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:1.13.2
+# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:0.1
 # mc-host-cf.ps-ev.de.
 
 - Configuration Management
@@ -32,8 +12,16 @@ Bugs in docker_image_mc_srv_ctrl: -Rebuild
 	- dev, test, prod
 	- master configuration with code versions? (AMI IDs, etc.)
 
+- Setup cron to install security patches?
+   - Relogin in to aws ecr, after 11 hours or before loading a new image?
+      $(aws ecr get-login --no-include-email --region eu-central-1)
+   - yum update?
 
-# - OnDeleteStack: Save Running Map!
+- OnDeleteStack: Save Running Map!
+
+What to do with remaining parameters?
+   - Parameter: docker version with default 1.13/empty
+   - Parameter: AMI with default value
 
 - Write Setup instructions
 	- Setup ECR
