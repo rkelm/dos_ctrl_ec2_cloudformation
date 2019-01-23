@@ -41,7 +41,7 @@
                             "Effect": "Allow",
                             "Action": [
                                 "s3:ListBucket",
-                                "s3:ListBucketVersions",
+                                "s3:ListBucketVersions"
                             ],
                             "Resource": {
                                 "Fn::Join": [
@@ -134,42 +134,34 @@
         }
     },
     "Outputs": {
+        "InstanceProfileForMCDockerRunner": {
+            "Description": "Instance profile for ec2 instances running MC server docker images.",
+            "Value": {
+                "Ref": "MCDockerRunnerInstanceProfile"
+            },
+            "Export": {
+                "Name": "MCDockerRunnerInstanceProfile"
+            }
+        },
         "RoleForMCDockerRunner": {
-            "Description": "Role ID ",
+            "Description": "ID of the IAM role for ec2 instances running server docker images.",
             "Value": {
                 "Ref": "MCDockerRunnerRole"
+            },
+            "Export": {
+                "Name": "MCDockerRunnerRole"
             }
         },
         "MapBucketName": {
+            "Description": "Name of s3 bucket for saving MC maps.",
             "Value": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "arn:aws:s3:::",
-                        {
-                            "Ref": "MCMapBucketName"
-                        },
-                        "/*"
-                    ]
-                ]
+                "Ref": "MCMapBucketName"
             }
         },
-        "SNSTopic": {
+        "SNSTopicArn": {
+            "Description": "ARN of SNS Topic for MC server status notifications.",
             "Value": {
                 "Ref": "MCSNSTopic"
-            }
-        },
-        "Name": {
-            "Value": {
-                "Fn::Sub": "$AWS::StackName-RoleForMCDockerRunner"
-            }
-        },
-        "ID": {
-            "Value": {
-                "Fn::GetAtt": [
-                    "MCDockerRunnerRole",
-                    "RoleId"
-                ]
             }
         }
     }

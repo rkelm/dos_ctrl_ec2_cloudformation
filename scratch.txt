@@ -1,0 +1,57 @@
+,
+            "Export": {
+                "Name": {
+                    "Fn::Sub": {
+                        "$AWS::StackName-RoleForMCDockerRunner"
+                    }
+                },
+                "ID": {
+                    "Fn::GetAtt": [
+                        "MCDockerRunnerRole",
+                        "RoleId"
+                    ]
+                }
+            
+
+
+        "MCRenderCacheBucketName": {
+            "Description": "The name of the s3 bucket used to store the render cache for overs",
+            "Type": "String",
+            "Default": "mc-maps"
+        },
+        "MCPublicBucketName": {
+            "Description": "The name of the s3 bucket used to store MC maps. It must be created via the console to avoid accidental destruction.",
+            "Type": "String",
+            "Default": "mc-maps"
+        },
+
+        "MCRenderCacheBucket": {},
+        "MCPublicBucket": {},
+
+                            {
+                                "Ref": "MCRenderCache"
+                            },
+                            {
+                                "Ref": "MCPublicBucket"
+                            },
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Ref": "MCRenderCache"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            },
+                            {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Ref": "MCPublicBucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            },

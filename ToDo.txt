@@ -1,16 +1,19 @@
 ﻿# To-Do:
+
 # - CF Run Template 
-	- attach Role
+	- define exportes in setup-template: Rolename, SNS Topic, MapBucketName
+	- attach Profile
 	- Parameter: route 53 subdomain to assign
 
 # - Docker Image Ausführung-> ecr login + configure credentials
 #    (I have to use --net=host to enable the access to the metadata service)
 # - Parameter: docker container repository + tag to start (default value?)
 # - Load real srvctrl docker image
-# - Parameter: version or link to configuration for container
 
-# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:1.13.2
-# mc-host-cf.ps-ev.de.
+Bugs in docker_image_mc_srv_ctrl: -Rebuild
+	- Dockerfile: ms_srv_ctrl -> mc_srv_ctrl
+	- build.sh: INSTALL_PATH env var must be passed to docker build
+	- build.sh: image_info.txt to roofs/ and not to INSTALL_PATH 
 
 # Test parameter
 #   - Parameter: docker version with default 1.13/empty
@@ -19,6 +22,16 @@
 #   - Parameter: SSH Key Name, (Optionally autocreate key?)
 #   - Setup cron to install security patches?
 #   - Relogin in to aws ecr, after 11 hours or before loading a new image?
+
+# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:1.13.2
+# mc-host-cf.ps-ev.de.
+
+- Configuration Management
+	- Which entities -> which configurations
+	- how to pass configurations to entities 
+	- dev, test, prod
+	- master configuration with code versions? (AMI IDs, etc.)
+
 
 # - OnDeleteStack: Save Running Map!
 
