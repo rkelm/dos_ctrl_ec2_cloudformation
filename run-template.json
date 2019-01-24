@@ -92,11 +92,6 @@
             "Type": "String",
             "Default": "25565"
         },
-        "DockerVersion": {
-            "Description": "Version of Docker engine to install.",
-            "Type": "String",
-            "Default": "1.13.0"
-        },
         "DockerImage": {
             "Description": "Repo-name and tag of image to run.",
             "Type": "String"
@@ -114,10 +109,34 @@
             "Description": "Containers path to root with volumes.",
             "Type": "String",
             "Default": "/opt/mc_srv_ctrl"
+        },
+        "AWSTagKey": {
+            "Description": "Tag key to identify ec2 instances.",
+            "Type": "String"
+        },
+        "AWSTagValue": {
+            "Description": "Tag value to identify ec2 instances.",
+            "Type": "String"
+        },
+        "MapBucket": {
+            "Description": "S3 Bucketname to use for MC data.",
+            "Type": "String"
+        },
+        "RConPwd": {
+            "Description": "Password for RCon Connection to MC server.",
+            "Type": "String"
+        },
+        "BucketMapDir": {
+            "Description": "Prefix to store maps in s3 bucket.",
+            "Type": "String"
+        },
+        "BucketLogsDir": {
+            "Description": "Prefix to store logs in s3 bucket.",
+            "Type": "String"
         }
     },
     "Conditions": {
-        "AMIIdGiven": {
+        "AMIImageIdGiven": {
             "Fn::Not": [
                 {
                     "Fn::Equals": [
@@ -136,6 +155,18 @@
                         "",
                         {
                             "Ref": "KeyName"
+                        }
+                    ]
+                }
+            ]
+        },
+        "RConPwdGiven": {
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        "",
+                        {
+                            "Ref": "RConPwd"
                         }
                     ]
                 }
@@ -456,6 +487,58 @@
                         }
                     },
                     "Prepare": {
+                        "files": {
+                            "/opt/app/docker_env_file": {
+                                "content": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "AWS_TAGKEY=",
+                                            {
+                                                "Ref": "AWSTagKey"
+                                            },
+                                            "\\nAWS_TAGVALUE=",
+                                            {
+                                                "Ref": "AWSTagValue"
+                                            },
+                                            "\\nMAP_BUCKET=",
+                                            {
+                                                "Ref": "MapBucket"
+                                            },
+                                            "\\nBUCKET_MAP_DIR=",
+                                            {
+                                                "Ref": "BucketMapDir"
+                                            },
+                                            "\\nBUCKET_LOGS_DIR=",
+                                            {
+                                                "Ref": "BucketLogsDir"
+                                            },
+                                            {
+                                                "Fn::If": [
+                                                    "KeyNameGiven",
+                                                    {
+                                                        "Fn::Join": [
+                                                            "",
+                                                            [
+                                                                "\\nRCONPWD=",
+                                                                {
+                                                                    "Ref": "RConPwd"
+                                                                }
+                                                            ]
+                                                        ]
+                                                    },
+                                                    ""
+                                                ]
+                                            },
+                                            "\\n"
+                                        ]
+                                    ]
+                                },
+                                "mode": "000600",
+                                "owner": "ec2-user",
+                                "group": "ec2-user"
+                            }
+                        },
                         "commands": {
                             "01_add_ec_user_to_docker_group": {
                                 "command": {
@@ -505,6 +588,7 @@
                                                 "Ref": "MCPort"
                                             },
                                             " --name base-container",
+                                            " --env-file=/opt/app/docker_env_file",
                                             " --mount source=mc-world,target=",
                                             {
                                                 "Ref": "ContainerVolumeRoot"
@@ -534,20 +618,30 @@
             },
             "Properties": {
                 "ImageId": {
-                    "Fn::FindInMap": [
-                        "AWSRegionArch2AMI",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        {
-                            "Fn::FindInMap": [
-                                "AWSInstanceType2Arch",
-                                {
-                                    "Ref": "InstanceType"
-                                },
-                                "Arch"
-                            ]
-                        }
+                    "Fn::If": [
+                        "AMIImageIdGiven",
+                        [
+                            {
+                                "Ref": "AMIImageId"
+                            },
+                            {
+                                "Fn::FindInMap": [
+                                    "AWSRegionArch2AMI",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    },
+                                    {
+                                        "Fn::FindInMap": [
+                                            "AWSInstanceType2Arch",
+                                            {
+                                                "Ref": "InstanceType"
+                                            },
+                                            "Arch"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     ]
                 },
                 "InstanceType": {

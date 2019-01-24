@@ -1,68 +1,67 @@
 ﻿# To-Do:
 
-- Which values from config.sh must be passed into srv_ctrl container 
-  or preset at build time?
+- Recreate docker image srv_ctrl 
 
+- Create BATCH to load remote config (in local config?)
+	- local
+	- s3 - cache it till next launch/2h
+	- http - cacht it till next launch/2h
+
+- Create TEST remote config file -> How to share?
+- Create TEST local config file -> How to share?
 # 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:0.1
 # mc-host-cf.ps-ev.de.
 
-- Configuration Management
-	- Which entities -> which configurations
-	- how to pass configurations to entities 
-	- dev, test, prod
-	- master configuration with code versions? (AMI IDs, etc.)
+- Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
+	- Create prepare.bat to run setup-template.json (Fixed named stack)
+	- Create unprepare.bat to remove stack of setup-templage.json
+	- launch stack
+	- terminate stack
+	- TEST Run MC Vanilla
+		- Fix setup-template policy: Add route53 + ec2 + s3 list-objects
+		- Create Policy for AppRunner User in setup-template.json
+		- OnDeleteStack: Save Running Map!
+		- Test MC commands from dos_ctrl_docker_minecraft
+
+- Make DNSHOSTNAME optional in run_Template.json
+
+- Test not defining a SSH Key
+	- Remove SSH (Port20)  from security group if no key given.
 
 - Setup cron to install security patches?
+	- create admin script that is called every 6 hours.
    - Relogin in to aws ecr, after 11 hours or before loading a new image?
       $(aws ecr get-login --no-include-email --region eu-central-1)
    - yum update?
+   - Setup cron job with SNS reminder Mail, that server is running, in docker container?
 
-- OnDeleteStack: Save Running Map!
 
-What to do with remaining parameters?
-   - Parameter: docker version with default 1.13/empty
-   - Parameter: AMI with default value
+- Bug? srv_ctrl: run-map.sh: Filters on ec2 on tagkey and tagvalue to determine running map.
+  Shouldn't this only by filtered by Tagkey, as a map could else be running on on KID1 and KID2
+  at the same time?
+
+- What to do with remaining parameters?
+	- Create Batch file to create new configs with compatible software version numbers?
+	  As part of setup_server.bat?
+	- master configuration with code versions? (AMI IDs, etc.)
+
+- setup-template: Managed Policy: Add statements to allow setting of route53.
 
 - Write Setup instructions
 	- Setup ECR
 		- setup resource based policy 
 
-# Add IPv6 support.
-#   - security group
-#   - instance ssh
-#   - MC server
+- Add IPv6 support.
+   - security group
+   - instance ssh
+   - MC server
 
-OLD To-Do's:
-* dos_ctrl_ec2: Kick funktioniert nicht, weil sich das Fenster schließt bevor der Name eingegeben werden kann?
+- Bug: dos_ctrl_ec2: Kick.bat not working. Window closes too fast?
 
-* Make VolumeId optional.
-	- Create volume from configured snapshot, while instance starts.
-	- Find Volume/Snapshot by Tag (Name + Value)
-		- Instantiate volume from snapshot
-			- choose snapshot by ID or Tag
-			- volume definition overrides snapshop definition
-			- ID definition overrides tag definition
-        - Optionally delete created volume after termination, if created by snapshot.
-	    - Create snapshot for config mcd1 with tags
-		   - Zero volume with "zerofree" before taking a snapshot.
-				- Put a note about zerofree in readme.md dokumentation.
-
-* ec2_create_snap set optional comment tag by parameter or interactive input.
-
-* Pass environment variables to start.sh.
-
-* Setup cron job with reminder Mail, that server is running, in start.sh?
-	- Option in config.
-
-* Give feedback to user when prepare_server.sh/start.sh is done.
-* Query and show total number of running EC2 instances in launch and terminate BAT files. To ensure overview of total costs. Create STATUS BAT file to show if instance is running?
-* More error checking at instance termination cli calls.
-* Show and save host ssh key for later ssh connection validation.
-
-# - CF Template to create S3 Buckets -> move to overviewer project
-#	- mc-private/maps  (Keep secrets here?)
-#	- mc-render-cache/render-cache
-#	- mc-public/map-renders (Better keep map_ids.txt + configuration in separate Bucket?)
+- CF Template to create S3 Buckets -> move to overviewer project
+	- mc-private/maps  (Keep secrets here?)
+	- mc-render-cache/render-cache
+	- mc-public/map-renders (Better keep map_ids.txt + configuration in separate Bucket?)
 		- /resource-packs
 		- /index.html
 		- /map_ids.txt
