@@ -1,16 +1,9 @@
 ﻿# To-Do:
 
-- Recreate docker image srv_ctrl 
-
-- Create BATCH to load remote config (in local config?)
-	- local
-	- s3 - cache it till next launch/2h
-	- http - cacht it till next launch/2h
-
-- Create TEST remote config file -> How to share?
-- Create TEST local config file -> How to share?
-# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:0.1
+- Create TEST remote config file on s3
+# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:0.3
 # mc-host-cf.ps-ev.de.
+
 
 - Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
 	- Create prepare.bat to run setup-template.json (Fixed named stack)

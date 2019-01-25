@@ -32,20 +32,12 @@ FOR %%A IN ( %* ) DO (
 )
 
 REM Load config.
-SET _CONFIGFILE=config\ec2_config_%_CONFIG%.bat
+CALL load_config.bat %_CONFIG%
+
 SET _INSTIDFILE=instanceid_%_CONFIG%.txt
 
-REM Check if config file exists. If not complain.
-IF NOT EXIST %_CONFIGFILE% (
-	ECHO Konfigurationsdatei %_CONFIGFILE% nicht gefunden.
-	EXIT /B 1
-	)
-
-REM Load configuration variables.
-CALL %_CONFIGFILE%
-
 REM Check for running instance by searching for tag in aws cloud.
-aws ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% --output=text --query Reservations[*].Instances[*].InstanceId > %_INSTIDFILE%
+%AWS_BIN% ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% --output=text --query Reservations[*].Instances[*].InstanceId > %_INSTIDFILE%
 REM Delete instance id file if it is empty.
 for %%F in ("%_INSTIDFILE%") do if %%~zF equ 0 del "%%F"
 IF NOT EXIST %_INSTIDFILE% (
@@ -57,15 +49,15 @@ IF NOT EXIST %_INSTIDFILE% (
 SET /P _INSTANCEID=<%_INSTIDFILE%
 
 REM Send command.
-REM aws ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > commandid.txt
+REM %AWS_BIN% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > commandid.txt
 
-aws ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters "{\"commands\":[\"%_SERVER_COMMAND%\"]}" --query Command.CommandId > commandid.txt
+%AWS_BIN% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters "{\"commands\":[\"%_SERVER_COMMAND%\"]}" --query Command.CommandId > commandid.txt
 
 SET /P COMMANDID=<commandid.txt
 
 REM Wait till command execution terminates.
 :CMD_EXECUTION
-aws ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].Status --output text > cmd_status.txt
+%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].Status --output text > cmd_status.txt
 SET /P status=<cmd_status.txt
 IF [%STATUS%]==[InProgress] (
 	TIMEOUT /T 1 /NOBREAK > nul
@@ -77,9 +69,9 @@ CD /D %EXCURRENTDIR%
 
 IF [%STATUS%] == "Success" (
 	REM Get command output.
-	aws ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].CommandPlugins[*].Output --output text			
+	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].CommandPlugins[*].Output --output text			
 ) ELSE (
-	aws ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].CommandPlugins[*].Output --output text		
+	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].CommandPlugins[*].Output --output text		
 	EXIT /B 1
 )
 
