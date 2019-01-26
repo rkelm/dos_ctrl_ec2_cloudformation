@@ -33,6 +33,7 @@ FOR %%A IN ( %* ) DO (
 
 REM Load config.
 CALL load_config.bat %_CONFIG%
+IF ERRORLEVEL 2 EXIT /B 1
 
 SET _INSTIDFILE=instanceid_%_CONFIG%.txt
 

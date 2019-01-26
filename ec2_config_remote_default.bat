@@ -65,7 +65,6 @@ REM IP netmask client white list for connecting to SSH server.
 REM 0.0.0.0/0 allows all IPv4 addresses. (Required)
 SET SSHLocation=0.0.0.0/0
 
-
 REM Optional name of the app run on ec2. Used in messages. (Optional)
 SET APP_NAME=my_app
 
@@ -74,7 +73,11 @@ REM (Optional)
 SET CONNECTION_DATA=%DNSHOSTNAME%
 
 REM Set Image ID for root device of instance. (Optional)
-REM If left blank, a default amazon linux AMI will be chosen. 
+REM If left blank, the default amazon linux AMI defined in the
+REM setup-template CloudFormation Template will be used. 
+REM If you would like to automatically select the most current 
+REM default Amazon Linux AMI then set it to CURRENT.
+REM Example: SET IMAGEID=CURRENT
 REM Example: SET IMAGEID=ami-f9619996
 SET IMAGEID=
 
@@ -82,3 +85,7 @@ REM Name of EC2 Keypair for SSH Public Key Login. (Optional)
 REM Example: KEYPAIR=Power_User
 SET KEYPAIR=Power_User
 
+REM To specifiy RCON passwort used for authenticating to rcon
+REM of MC server, else the build time default RCON password is
+REM used. (optional)
+SET RCONPWD=

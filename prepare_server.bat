@@ -20,6 +20,8 @@ IF NOT DEFINED _CONFIG (
 REM Load config.
 CALL load_config.bat %_CONFIG%
 
+IF ERRORLEVEL 2 EXIT /B 1
+
 REM Upload CloudFormation Templates
 REM %AWS_BIN% --region %REGION% s3 cp prepare-template.json s3://%MAP_BUCKET%/prepare-template.json
 REM %AWS_BIN% --region %REGION% s3 cp run-template.json s3://%MAP_BUCKET%/run-template.json
@@ -30,6 +32,7 @@ ECHO Creating prepared stack...
   --template-body file://prepare-template.json ^
   --parameters ParameterKey=MCMapBucketName,ParameterValue=%MAP_BUCKET% ^
     ParameterKey=MCSNSEmailAddress,ParameterValue=%ADMIN_EMAIL% ^
+    ParameterKey=StackAlias,ParameterValue=%_CONFIG% ^
   --capabilities CAPABILITY_IAM --on-failure DELETE ^
   --tags Key=%TAGKEY%,Value=%TAGVALUE% ^
   --output text

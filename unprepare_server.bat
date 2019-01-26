@@ -19,13 +19,15 @@ IF NOT DEFINED _CONFIG (
 REM Load config.
 CALL load_config.bat %_CONFIG%
 
+IF ERRORLEVEL 2 EXIT /B 1
+
 REM Delete prepared CloudFormation Stack
 ECHO Deleting prepared stack...
 %AWS_BIN% --region %REGION% cloudformation delete-stack --stack-name %STACKNAME%-Prepared ^
   --output text
 
-REM Wait until stack deleteion has finished.
-ECHO Waiting for end of stack deleteion...
+REM Wait until stack deletion has finished.
+ECHO Waiting for end of stack delete...
 %AWS_BIN% --region %REGION% cloudformation wait stack-delete-complete --stack-name %STACKNAME%-Prepared
 
 REM Check for error.

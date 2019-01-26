@@ -18,7 +18,6 @@
         "StackAlias": {
             "Description": "",
             "Type": "String",
-            "Default": "TEST",
             "MinLength": "1"
         }
     },

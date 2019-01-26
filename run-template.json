@@ -133,6 +133,11 @@
         "BucketLogsDir": {
             "Description": "Prefix to store logs in s3 bucket.",
             "Type": "String"
+        },
+        "StackAlias": {
+            "Description": "",
+            "Type": "String",
+            "MinLength": "1"
         }
     },
     "Conditions": {
@@ -497,30 +502,30 @@
                                             {
                                                 "Ref": "AWSTagKey"
                                             },
-                                            "\\nAWS_TAGVALUE=",
+                                            "\nAWS_TAGVALUE=",
                                             {
                                                 "Ref": "AWSTagValue"
                                             },
-                                            "\\nMAP_BUCKET=",
+                                            "\nMAP_BUCKET=",
                                             {
                                                 "Ref": "MapBucket"
                                             },
-                                            "\\nBUCKET_MAP_DIR=",
+                                            "\nBUCKET_MAP_DIR=",
                                             {
                                                 "Ref": "BucketMapDir"
                                             },
-                                            "\\nBUCKET_LOGS_DIR=",
+                                            "\nBUCKET_LOGS_DIR=",
                                             {
                                                 "Ref": "BucketLogsDir"
                                             },
                                             {
                                                 "Fn::If": [
-                                                    "KeyNameGiven",
+                                                    "RConPwdGiven",
                                                     {
                                                         "Fn::Join": [
                                                             "",
                                                             [
-                                                                "\\nRCONPWD=",
+                                                                "\nRCONPWD=",
                                                                 {
                                                                     "Ref": "RConPwd"
                                                                 }
@@ -530,7 +535,7 @@
                                                     ""
                                                 ]
                                             },
-                                            "\\n"
+                                            "\n"
                                         ]
                                     ]
                                 },
@@ -620,28 +625,26 @@
                 "ImageId": {
                     "Fn::If": [
                         "AMIImageIdGiven",
-                        [
-                            {
-                                "Ref": "AMIImageId"
-                            },
-                            {
-                                "Fn::FindInMap": [
-                                    "AWSRegionArch2AMI",
-                                    {
-                                        "Ref": "AWS::Region"
-                                    },
-                                    {
-                                        "Fn::FindInMap": [
-                                            "AWSInstanceType2Arch",
-                                            {
-                                                "Ref": "InstanceType"
-                                            },
-                                            "Arch"
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
+                        {
+                            "Ref": "AMIImageId"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "AWSRegionArch2AMI",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                {
+                                    "Fn::FindInMap": [
+                                        "AWSInstanceType2Arch",
+                                        {
+                                            "Ref": "InstanceType"
+                                        },
+                                        "Arch"
+                                    ]
+                                }
+                            ]
+                        }
                     ]
                 },
                 "InstanceType": {
@@ -664,8 +667,28 @@
                     ]
                 },
                 "IamInstanceProfile": {
-                    "Fn::ImportValue": "MCDockerRunnerInstanceProfile"
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "MCDockerRunnerInstanceProfile-",
+                                {
+                                    "Ref": "StackAlias"
+                                }
+                            ]
+                        ]
+                    }
                 },
+                "Tags": [
+                    {
+                        "Key": {
+                            "Ref": "AWSTagKey"
+                        },
+                        "Value": {
+                            "Ref": "AWSTagValue"
+                        }
+                    }
+                ],
                 "UserData": {
                     "Fn::Base64": {
                         "Fn::Join": [

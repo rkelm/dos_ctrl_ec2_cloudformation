@@ -80,6 +80,7 @@ IF ERRORLEVEL 1 (
 ECHO Loading cached config file 
 CALL config\cached\%REMOTE_CONFIG_FILE%
 
+
 GOTO:end
 
 :remote_config_is_local
@@ -88,3 +89,4 @@ ECHO Loading local file of remote config.
 CALL %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE%
 
 :end
+IF ERRORLEVEL 2 EXIT /B 2
