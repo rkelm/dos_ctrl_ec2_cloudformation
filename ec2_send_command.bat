@@ -2,11 +2,23 @@
 REM Batch file to launch ec2 instance.
 SETLOCAL enabledelayedexpansion
 
+REM Remember previous current directory.
+SET EXCURRENTDIR=%CD%
+REM Switch current directory to installation directory.
+CD /D %~dp0
+
+
 SET _CONFIG=%1
 IF NOT DEFINED _CONFIG (
   ECHO Es muss ein Konfigurationskuerzel als Parameter angegeben werden.
   EXIT /B 1
 )
+
+REM SET INSTIDFILE=instanceid_%CONFIG%.txt
+
+REM Load config.
+CALL load_config.bat %_CONFIG%
+IF ERRORLEVEL 2 EXIT /B 1
 
 REM Check command line paramters.
 SET _APP_CMD=%2
@@ -15,11 +27,7 @@ IF NOT DEFINED _APP_CMD (
 	ECHO Bitte geben sie ein Kommando als zweiten Parameter an.
 	EXIT /B 1
 )
-REM Remember previous current directory.
-SET EXCURRENTDIR=%CD%
 
-REM Switch current directory to installation directory.
-CD /D %~dp0
 REM Prepare server command.
 SET _I=0
 SET _SERVER_COMMAND=
@@ -31,14 +39,13 @@ FOR %%A IN ( %* ) DO (
 	)
 )
 
-REM Load config.
-CALL load_config.bat %_CONFIG%
-IF ERRORLEVEL 2 EXIT /B 1
-
 SET _INSTIDFILE=instanceid_%_CONFIG%.txt
 
 REM Check for running instance by searching for tag in aws cloud.
-%AWS_BIN% ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% --output=text --query Reservations[*].Instances[*].InstanceId > %_INSTIDFILE%
+%AWS_BIN% ec2 describe-instances ^
+  --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% ^
+  --output=text ^
+  --query Reservations[*].Instances[*].InstanceId > %_INSTIDFILE%
 REM Delete instance id file if it is empty.
 for %%F in ("%_INSTIDFILE%") do if %%~zF equ 0 del "%%F"
 IF NOT EXIST %_INSTIDFILE% (
@@ -52,27 +59,34 @@ SET /P _INSTANCEID=<%_INSTIDFILE%
 REM Send command.
 REM %AWS_BIN% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > commandid.txt
 
-%AWS_BIN% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters "{\"commands\":[\"%_SERVER_COMMAND%\"]}" --query Command.CommandId > commandid.txt
+%AWS_BIN% ssm send-command --instance-ids %_INSTANCEID% ^
+  --document-name "AWS-RunShellScript" ^
+  --parameters "{\"commands\":[\"%_SERVER_COMMAND%\"]}" ^
+  --query Command.CommandId > commandid.txt
 
 SET /P COMMANDID=<commandid.txt
 
 REM Wait till command execution terminates.
 :CMD_EXECUTION
-%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].Status --output text > cmd_status.txt
+%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" ^
+  --detail --query CommandInvocations[*].Status ^
+  --output text > cmd_status.txt
 SET /P status=<cmd_status.txt
 IF [%STATUS%]==[InProgress] (
 	TIMEOUT /T 1 /NOBREAK > nul
 	GOTO CMD_EXECUTION
 )
 
-REM Restore previous current directory.
-CD /D %EXCURRENTDIR%
-
 IF [%STATUS%] == "Success" (
 	REM Get command output.
-	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].CommandPlugins[*].Output --output text			
+	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" ^
+	  --detail --query CommandInvocations[*].CommandPlugins[*].Output ^
+	  --output text			
 ) ELSE (
-	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" --detail --query CommandInvocations[*].CommandPlugins[*].Output --output text		
-	EXIT /B 1
+	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" ^
+	  --detail --query CommandInvocations[*].CommandPlugins[*].Output ^
+	  --output text		
 )
 
+REM Restore previous current directory.
+CD /D %EXCURRENTDIR%

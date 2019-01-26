@@ -14,7 +14,7 @@ IF NOT DEFINED _CONFIG (
   EXIT /B 1
 )
 
-SET INSTIDFILE=instanceid_%CONFIG%.txt
+REM SET INSTIDFILE=instanceid_%CONFIG%.txt
 
 REM Load config.
 CALL load_config.bat %_CONFIG%
