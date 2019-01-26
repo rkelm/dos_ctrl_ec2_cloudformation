@@ -1,13 +1,6 @@
 ﻿# To-Do:
 
-- Create TEST remote config file on s3
-# 188892360808.dkr.ecr.eu-central-1.amazonaws.com/mc_srv_ctrl:0.3
-# mc-host-cf.ps-ev.de.
-
-
 - Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
-	- Create prepare.bat to run setup-template.json (Fixed named stack)
-	- Create unprepare.bat to remove stack of setup-templage.json
 	- launch stack
 	- terminate stack
 	- TEST Run MC Vanilla
@@ -16,18 +9,13 @@
 		- OnDeleteStack: Save Running Map!
 		- Test MC commands from dos_ctrl_docker_minecraft
 
+- Integrate dos_ec2_docker_minecraft batch files
+
+
 - Make DNSHOSTNAME optional in run_Template.json
 
 - Test not defining a SSH Key
 	- Remove SSH (Port20)  from security group if no key given.
-
-- Setup cron to install security patches?
-	- create admin script that is called every 6 hours.
-   - Relogin in to aws ecr, after 11 hours or before loading a new image?
-      $(aws ecr get-login --no-include-email --region eu-central-1)
-   - yum update?
-   - Setup cron job with SNS reminder Mail, that server is running, in docker container?
-
 
 - Bug? srv_ctrl: run-map.sh: Filters on ec2 on tagkey and tagvalue to determine running map.
   Shouldn't this only by filtered by Tagkey, as a map could else be running on on KID1 and KID2
@@ -38,7 +26,13 @@
 	  As part of setup_server.bat?
 	- master configuration with code versions? (AMI IDs, etc.)
 
-- setup-template: Managed Policy: Add statements to allow setting of route53.
+- Setup cron to install security patches?
+	- create admin script that is called every 6 hours.
+   - Relogin in to aws ecr, after 11 hours or before loading a new image?
+      $(aws ecr get-login --no-include-email --region eu-central-1)
+   - yum update?
+   - Setup cron job with SNS reminder Mail, that server is running, in docker container?
+
 
 - Write Setup instructions
 	- Setup ECR

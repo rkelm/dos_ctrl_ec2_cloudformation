@@ -14,6 +14,12 @@
             "AllowedPattern": "^[\\x20-\\x45]?[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$",
             "ConstraintDescription": "Valid email adress",
             "MinLength": "5"
+        },
+        "StackAlias": {
+            "Description": "",
+            "Type": "String",
+            "Default": "TEST",
+            "MinLength": "1"
         }
     },
     "Resources": {
@@ -80,7 +86,7 @@
                                 "s3:PutObjectTagging",
                                 "s3:PutObjectVersion",
                                 "s3:PutObjectVersionTagging",
-                                "s3::list-objects-v2"
+                                "s3:list-objects-v2"
                             ],
                             "Resource": {
                                 "Fn::Join": [
@@ -97,7 +103,7 @@
                         },
                         {
                             "Effect": "Allow",
-                            "Action": "sns:Publish",
+                            "Action": [ "sns:Publish" ],
                             "Resource": {
                                 "Ref": "MCSNSTopic"
                             }
@@ -151,7 +157,17 @@
                 "Ref": "MCDockerRunnerInstanceProfile"
             },
             "Export": {
-                "Name": "MCDockerRunnerInstanceProfile"
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "MCDockerRunnerInstanceProfile-",
+                            {
+                                "Ref": "StackAlias"
+                            }
+                        ]
+                    ]
+                }
             }
         },
         "RoleForMCDockerRunner": {
@@ -160,7 +176,17 @@
                 "Ref": "MCDockerRunnerRole"
             },
             "Export": {
-                "Name": "MCDockerRunnerRole"
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "MCDockerRunnerRole-",
+                            {
+                                "Ref": "StackAlias"
+                            }
+                        ]
+                    ]
+                }
             }
         },
         "MapBucketName": {

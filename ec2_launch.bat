@@ -47,7 +47,7 @@ IF EXIST %INSTIDFILE% (
 )
 
 REM Check for running instance by searching for tag in aws cloud.
-%AWS_BIN% ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% --output=text --query Reservations[*].Instances[*].InstanceId > %INSTIDFILE%
+%AWS_BIN% --region %REGION% ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% --output=text --query Reservations[*].Instances[*].InstanceId > %INSTIDFILE%
 REM Delete instance id file if it is empty.
 for %%F in ("%INSTIDFILE%") do if %%~zF equ 0 del "%%F"
 IF EXIST %INSTIDFILE% (
@@ -191,7 +191,7 @@ IF ERRORLEVEL 1 (
 REM If this volume was created by this script, then it should be marked to be deleted at instance termination.
 IF "%_VOLUMECREATED%" == "TRUE" (
 	ECHO Markiere temporaeres Volume als "DeleteOnTermination".
-	%AWS_BIN% ec2 modify-instance-attribute --instance-id %INSTANCEID% --block-device-mappings "[{\"DeviceName\": \"/dev/sdf\",\"Ebs\":{\"DeleteOnTermination\":true}}]"
+	%AWS_BIN% --region %REGION% ec2 modify-instance-attribute --instance-id %INSTANCEID% --block-device-mappings "[{\"DeviceName\": \"/dev/sdf\",\"Ebs\":{\"DeleteOnTermination\":true}}]"
 	IF ERRORLEVEL 1 (
 		ECHO Fehler beim Markieren des temporaeren Volumes "%_VOLUMEID% mit "DeleteOnTermination".
 		)
