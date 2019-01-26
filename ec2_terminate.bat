@@ -18,15 +18,6 @@ SET INSTIDFILE=instanceid_%CONFIG%.txt
 
 REM Load config.
 CALL load_config.bat %_CONFIG%
-SET _CONFIG=%1
-IF NOT DEFINED _CONFIG (
-  ECHO Es muss ein Konfigurationskuerzel als Parameter angegeben werden.
-  EXIT /B 1
-)
-
-REM Load config.
-CALL load_config.bat %_CONFIG%
-
 IF ERRORLEVEL 2 EXIT /B 1
 
 REM Insert stop/save MC Server here
