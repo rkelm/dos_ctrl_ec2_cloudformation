@@ -1,7 +1,7 @@
 ﻿# To-Do:
 
 - Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
-	- Pass name of volumes from CF run template to srv_ctrl container
+	- Fix path
 	- Rename to cf_launch, cf_terminate, cf_...
 	- Integrate / Test MC commands from dos_ctrl_docker_minecraft
 	- TEST Run MC Vanilla
@@ -28,12 +28,25 @@
         "iam:PassRole"
     ],
     "Resource": "arn:aws:iam::123456789012:role/my-role-for-XYZ"
-	
+
+- Test other maps.
+
+- 13.2
+	- Update Spigot + Spigot WE docker images
+	- Update other maps to 
+
 - Verify that deleting of old cache remote config works.
 - What to do with remaining parameters?
 	- Create Batch file to create new configs with compatible software version numbers?
 	  As part of setup_server.bat?
 	- master configuration with code versions? (AMI IDs, etc.)
+
+- Build package
+	- Test build.bat
+	- Publish client install package
+	- Prepare client configs
+	- Deploy to clients
+	- Update MC Clients with VoxelMap
 
 - Setup cron to install security patches?
 	- create admin script that is called every 6 hours.

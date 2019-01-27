@@ -55,3 +55,6 @@
                                     ]
                                 ]
                             },
+
+run_map.sh:    ${bin_dir}/compose_up.sh
+compose_up.sh:"$docker_compose" -f "${map_data_dir}/docker-compose.yml" up -d

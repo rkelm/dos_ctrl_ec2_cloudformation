@@ -134,6 +134,16 @@
             "Description": "Prefix to store logs in s3 bucket.",
             "Type": "String"
         },
+        "DockerNamedVolumeLogs": {
+            "Description": "Unique name of the docker named volume used to mount the container logs directory.",
+            "Type": "String",
+            "Default": "mc-logs"
+        },
+        "DockerNamedVolumeMaps": {
+            "Description": "Unique name of the docker named volume used to mount the container maps directory.",
+            "Type": "String",
+            "Default": "mc-map"
+        },
         "StackAlias": {
             "Description": "",
             "Type": "String",
@@ -535,6 +545,18 @@
                                                     ""
                                                 ]
                                             },
+                                            "\nHOST_NAMEDVOLUME_MAPS=",
+                                            {
+                                                "Ref": "DockerNamedVolumeMaps"
+                                            },
+                                            "\nHOST_NAMEDVOLUME_LOGS=",
+                                            {
+                                                "Ref": "DockerNamedVolumeLogs"
+                                            },
+                                            "\nHOST_MCPORT=",
+                                            {
+                                                "Ref": "MCPort"
+                                            },
                                             "\n"
                                         ]
                                     ]
@@ -594,16 +616,24 @@
                                             },
                                             " --name base-container",
                                             " --env-file=/opt/app/docker_env_file",
-                                            " --mount source=mc-world,target=",
+                                            " --mount source=",
+                                            {
+                                                "Ref": "DockerNamedVolumeMaps"
+                                            },
+                                            ",target=",
                                             {
                                                 "Ref": "ContainerVolumeRoot"
                                             },
-                                            "/world",
-                                            " --mount source=mc-logs,target=",
+                                            "/map_data",
+                                            " --mount source=",
+                                            {
+                                                "Ref": "DockerNamedVolumeLogs"
+                                            },
+                                            ",target=",
                                             {
                                                 "Ref": "ContainerVolumeRoot"
                                             },
-                                            "/logs",
+                                            "/map_logs",
                                             " -v /var/run/docker.sock:/var/run/docker.sock ",
                                             {
                                                 "Ref": "DockerImage"
