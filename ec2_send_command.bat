@@ -7,7 +7,6 @@ SET EXCURRENTDIR=%CD%
 REM Switch current directory to installation directory.
 CD /D %~dp0
 
-
 SET _CONFIG=%1
 IF NOT DEFINED _CONFIG (
   ECHO Es muss ein Konfigurationskuerzel als Parameter angegeben werden.
@@ -38,7 +37,10 @@ FOR %%A IN ( %* ) DO (
 		SET _SERVER_COMMAND=!_SERVER_COMMAND! %%A
 	)
 )
+REM Add docker exec to send command to srv_ctrl container.
+SET _SERVER_COMMAND=docker exec -t base-container %_SERVER_COMMAND%
 
+REM ECHO _SERVER_COMMAND %_SERVER_COMMAND%
 SET _INSTIDFILE=instanceid_%_CONFIG%.txt
 
 REM Check for running instance by searching for tag in aws cloud.

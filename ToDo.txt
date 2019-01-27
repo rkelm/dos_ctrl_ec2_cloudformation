@@ -1,25 +1,35 @@
 ﻿# To-Do:
 
 - Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
-	- fix sendmessage batch
+	- Pass name of volumes from CF run template to srv_ctrl container
+	- Rename to cf_launch, cf_terminate, cf_...
+	- Integrate / Test MC commands from dos_ctrl_docker_minecraft
 	- TEST Run MC Vanilla
 	- OnDeleteStack: Save Running Map!
-	- Integrate / Test MC commands from dos_ctrl_docker_minecraft
-
-- Integrate dos_ec2_docker_minecraft batch files
 
 - Make DNSHOSTNAME optional in run_Template.json
 
 - Test not defining a SSH Key
 	- Remove SSH (Port20)  from security group if no key given.
 
+- Test prepare and unprepare of stack.
+
 - Bug? srv_ctrl: run-map.sh: Filters on ec2 on tagkey and tagvalue to determine running map.
   Shouldn't this only by filtered by Tagkey, as a map could else be running on on KID1 and KID2
-  at the same time?
+  at the same time? Isn't this checked for by src_ctrl run_map.sh anyway?
 
 - Fix setup-template policy: Add route53 + ec2 + s3 list-objects
 - Create Policy for AppRunner User in setup-template.json
-
+	- Pass SSM Role 
+	{
+    "Effect": "Allow",
+    "Action": [
+        "iam:ListRoles",
+        "iam:PassRole"
+    ],
+    "Resource": "arn:aws:iam::123456789012:role/my-role-for-XYZ"
+	
+- Verify that deleting of old cache remote config works.
 - What to do with remaining parameters?
 	- Create Batch file to create new configs with compatible software version numbers?
 	  As part of setup_server.bat?
@@ -35,6 +45,12 @@
 - Write Setup instructions
 	- Setup ECR
 		- setup resource based policy 
+
+- Setup Murmur server 
+https://hub.docker.com/r/goofball222/murmur/
+https://octo.sh/container-library/murmur-docker
+https://github.com/mattikus/docker-murmur
+
 
 - Add IPv6 support.
    - security group

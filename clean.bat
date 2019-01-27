@@ -12,6 +12,8 @@ CD /D %~dp0
 ECHO Deleting temporary files.
 IF EXIST prepared-stack.txt DEL prepared-stack.txt
 IF EXIST dos_ctrl_ec2.log DEL dos_ctrl_ec2.log
+IF EXIST cmd_status.txt DEL cmd_status.txt
+IF EXIST commandid.txt DEL commandid.txt
 
 REM Switching back to previous directory.
 CD %EXCURRENTDIR%

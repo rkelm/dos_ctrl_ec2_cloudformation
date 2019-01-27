@@ -2,3 +2,7 @@
 /utils/
 prepared-stack.txt
 dos_ctrl_ec2.log
+cmd_status.txt
+commandid.txt
+instanceid_*.txt
+output.txt

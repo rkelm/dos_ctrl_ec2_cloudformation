@@ -102,7 +102,9 @@
                         },
                         {
                             "Effect": "Allow",
-                            "Action": [ "sns:Publish" ],
+                            "Action": [
+                                "sns:Publish"
+                            ],
                             "Resource": {
                                 "Ref": "MCSNSTopic"
                             }
@@ -131,6 +133,7 @@
                 },
                 "ManagedPolicyArns": [
                     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+                    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
                     {
                         "Ref": "MCDockerRunnerPolicy"
                     }
