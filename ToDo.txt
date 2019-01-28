@@ -1,8 +1,5 @@
 ﻿# To-Do:
-
 - Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
-	- Fix path
-	- Rename to cf_launch, cf_terminate, cf_...
 	- Integrate / Test MC commands from dos_ctrl_docker_minecraft
 	- TEST Run MC Vanilla
 	- OnDeleteStack: Save Running Map!
@@ -41,12 +38,19 @@
 	  As part of setup_server.bat?
 	- master configuration with code versions? (AMI IDs, etc.)
 
-- Build package
+- Release 0.1
 	- Test build.bat
+	- Build package
 	- Publish client install package
 	- Prepare client configs
 	- Deploy to clients
 	- Update MC Clients with VoxelMap
+
+- secure configs
+	- image building: /vagrant/set...
+	- clients
+	- How to distribute? Via s3, samba?
+
 
 - Setup cron to install security patches?
 	- create admin script that is called every 6 hours.
