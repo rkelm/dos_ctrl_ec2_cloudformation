@@ -38,10 +38,25 @@
         "MCDockerRunnerPolicy": {
             "Type": "AWS::IAM::ManagedPolicy",
             "Properties": {
-                "Description": "Customer Managed Policy to MC docker images from ecr plus configuration and data from S3d data.",
+                "Description": "Customer Managed Policy to load MC docker images from ecr plus configuration and data from S3d data.",
                 "PolicyDocument": {
                     "Version": "2012-10-17",
                     "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "route53:ListHostedZonesByName",
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "route53:ChangeResourceRecordSets",
+                                "route53:ListResourceRecordSets"
+                            ],
+                            "Resource": "*"
+                        },
                         {
                             "Effect": "Allow",
                             "Action": [
