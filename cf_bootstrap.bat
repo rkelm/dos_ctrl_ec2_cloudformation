@@ -38,7 +38,7 @@ IF EXIST %INSTIDFILE% (
 		SET /P OUTPUT=<output.txt
 		IF NOT [!OUTPUT!] == [EMPTY] (
 			REM Instance ist still running. Complain to user and exit.
-			ECHO Es laeuft bereits eine %APP_NAME% Server Instanz!
+			ECHO Es laeuft bereits eine Instanz von %APP_NAME% !
 			ECHO Start einer neuen Instanz wird abgebrochen.
 			ECHO Bitte erst die alte Instanz beenden.
 			EXIT /b 1
@@ -51,7 +51,7 @@ REM Check for running instance by searching for tag in aws cloud.
 REM Delete instance id file if it is empty.
 for %%F in ("%INSTIDFILE%") do if %%~zF equ 0 del "%%F"
 IF EXIST %INSTIDFILE% (
-  ECHO Es laeuft bereits eine %APP_NAME% Server Instanz!
+  ECHO Es laeuft bereits eine Instanz von %APP_NAME% !
   ECHO Start einer neuen Instanz wird abgebrochen.
   ECHO Bitte erst die alte Instanz beenden.
   EXIT /b 1
@@ -84,6 +84,11 @@ IF NOT [%IMAGEID%] == [] (
 	%AWS_BIN% ec2 describe-images --region %REGION% --image-id %IMAGEID% --query "Images[].[ImageId, Name, CreationDate, RootDeviceName]" --output text
 )
 
+IF DEFINED DNSHOSTNAME (
+  REM Add dot to DNSHOSTNAME, if Hostname is configured.
+  SET _DNSHOSTNAME=ParameterKey=HostSubdomain,ParameterValue=%DNSHOSTNAME%.
+)
+
 REM Launch Amazon Linux Instance. Run prepare_server.sh on server.
 ECHO Starte AWS CloudFormation Stack %STACKNAME%-Run fuer %APP_NAME%.
 %AWS_BIN% --region %REGION% cloudformation create-stack ^
@@ -98,7 +103,7 @@ ECHO Starte AWS CloudFormation Stack %STACKNAME%-Run fuer %APP_NAME%.
   ParameterKey=MCPort,ParameterValue=%MCPORT% ^
   ParameterKey=DockerImage,ParameterValue=%SRV_CTRL_IMAGE% ^
   ParameterKey=AMIImageId,ParameterValue=%IMAGEID% ^
-  ParameterKey=HostSubdomain,ParameterValue=%DNSHOSTNAME% ^
+  %_DNSHOSTNAME% ^
   ParameterKey=AWSTagKey,ParameterValue=%TAGKEY% ^
   ParameterKey=AWSTagValue,ParameterValue=%TAGVALUE% ^
   ParameterKey=BucketMapDir,ParameterValue=%MAP_S3_KEY% ^
