@@ -144,12 +144,6 @@
             "Type": "String",
             "Default": "mc-map"
         },
-        "AWSRegion": {
-            "Description": "The aws region to create the stack in.",
-            "Type": "String",
-            "MinLength": "1",
-            "Default": "eu-central-1"
-        },
         "StackAlias": {
             "Description": "",
             "Type": "String",
@@ -565,7 +559,7 @@
                                             },
                                             "\nREGION=",
                                             {
-                                                "Ref": "AWSRegion"
+                                                "Ref": "AWS::Region"
                                             },
                                             "\n"
                                         ]
@@ -744,7 +738,7 @@
                                 },
                                 "         --resource McServerInstance ",
                                 "         --configsets InstallAndRun ",
-                                "         --region ",
+                                "         -- ",
                                 {
                                     "Ref": "AWS::Region"
                                 },
