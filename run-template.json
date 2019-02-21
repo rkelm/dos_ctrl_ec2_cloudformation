@@ -144,6 +144,12 @@
             "Type": "String",
             "Default": "mc-map"
         },
+        "AWSRegion": {
+            "Description": "The aws region to create the stack in.",
+            "Type": "String",
+            "MinLength": "1",
+            "Default": "eu-central-1"
+        },
         "StackAlias": {
             "Description": "",
             "Type": "String",
@@ -556,6 +562,10 @@
                                             "\nHOST_MCPORT=",
                                             {
                                                 "Ref": "MCPort"
+                                            },
+                                            "\nREGION=",
+                                            {
+                                                "Ref": "AWSRegion"
                                             },
                                             "\n"
                                         ]

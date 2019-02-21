@@ -43,7 +43,7 @@ REM Create directory for caching configs.
 IF NOT EXIST config\cached mkdir config\cached
 
 REM Delete cached files older than 1 day.
-FORFILES /P config\cached /M %REMOTE_CONFIG_FILE% /D +1 /C "echo del @file" 2> nul
+FORFILES /P config\cached /M %REMOTE_CONFIG_FILE% /D -1 /C "cmd /c del @file" 2> nul
 
 IF EXIST config\cached\%REMOTE_CONFIG_FILE% GOTO load_cached_config_file
 
