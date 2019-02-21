@@ -40,7 +40,7 @@ REM Must be unique to safely identify the running instance!
 SET TAGKEY=MC-SERVER
 SET TAGVALUE=VANILLA
 
-REM Dynamic DNS host name for the server. Please end it with a dot.
+REM Dynamic DNS host name for the server.
 REM (Required)
 SET DNSHOSTNAME=my-ec2-server.example.com
 
