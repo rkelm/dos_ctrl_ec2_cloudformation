@@ -110,7 +110,6 @@ ECHO Starte AWS CloudFormation Stack %STACKNAME%-Run fuer %APP_NAME%.
   ParameterKey=BucketLogsDir,ParameterValue=%LOGS_S3_KEY% ^
   ParameterKey=StackAlias,ParameterValue=%_CONFIG% ^
   ParameterKey=RConPwd,ParameterValue=%RCONPWD% ^
-  ParameterKey=AWSRegion,ParameterValue=%REGION% ^
   --on-failure DELETE ^
   --tags Key=%TAGKEY%,Value=%TAGVALUE% ^
   --output text
