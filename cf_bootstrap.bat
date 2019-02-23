@@ -126,12 +126,12 @@ ECHO Waiting for end of stack creation...
 REM Check for error.
 ECHO Verifying success...
 %AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Run ^
-  --query Stacks[0].StackId --output text > prepared-stack.txt
-SET /P _STACKID=<prepared-stack.txt
+  --query Stacks[0].StackId --output text > run-stack.txt
+SET /P _STACKID=<run-stack.txt
 IF DEFINED _STACKID (
-    ECHO Success. Prepared stack created.
+    ECHO Success. Run stack created.
 ) ELSE (
-    ECHO Failed. Prepared stack not created.
+    ECHO Failed. Run stack not created.
 	EXIT /B 1
 )
 
