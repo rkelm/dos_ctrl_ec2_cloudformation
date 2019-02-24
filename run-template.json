@@ -614,10 +614,7 @@
                                     "Fn::Join": [
                                         "",
                                         [
-                                            "docker run -d -p 25565:",
-                                            {
-                                                "Ref": "MCPort"
-                                            },
+                                            "docker run -d ",
                                             " --name base-container",
                                             " --env-file=/opt/app/docker_env_file",
                                             " --mount source=",
@@ -738,7 +735,7 @@
                                 },
                                 "         --resource McServerInstance ",
                                 "         --configsets InstallAndRun ",
-                                "         -- ",
+                                "         --region ",
                                 {
                                     "Ref": "AWS::Region"
                                 },
