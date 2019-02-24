@@ -1,33 +1,58 @@
 ﻿# To-Do:
 
-- Pass configuration of setup_route_53.py by env vars
-  - hostedzoneID is needed -> Look it up via aws cli when not in config file?
-  - No error when config file is missing. Simply print a warning.
-  - for docker image no aws credentials needed.
-  - in setup_route_53.py only pass credentials when
-    provided via environment or config file
-
+- commit & push all
+	- srv_ctrl
+	- vanilla
+	- cf_cmds
+	
 - Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
-	- TEST Run test spigot
 	- Rename / Integrate / Test MC commands from dos_ctrl_docker_minecraft
 		- docmc_cmd
 		- docmc_launch
 		- terminate
+		- OnDeleteStack: Save Running Map!
 		- savemap
 		- runmap
 		- Kick
-		- punish
 		- whitelist 3x
-	- OnDeleteStack: Save Running Map!
+		- punish
+		- ipconfig /flushdns batch
+
+- Does config file caching work.
+
+- Clean up docker_bakery
+	- push all changes
+	- retest
+	- one install should be enough
+
+- Update other images.
+  - correct: passing each build env var with --build-arg parameter
+  - move bukkit to other directory than server?
+
+- Update other maps:
+	- add eula=true
+	- change world directory layout
+	- update cocker-compose.yml
+      - change compose file version to version: "3"
+		- Better external with name, else projectname gets appended?
+			volumes:
+			data:
+				external: 
+				name: dfadf
+
+- TEST all new images and all new maps.
+
+- commit and push all!!
 
 - Make DNSHOSTNAME optional in run_Template.json
+- DockerRunnerPolicy: Supply route53 Resource as parameter (arn:aws:route53:::hostedzone/hosted zone ID)
 
 - Test not defining a SSH Key
 	- Remove SSH (Port20)  from security group if no key given.
 
 - Test prepare and unprepare of stack.
 
-- Create Policy for AppRunner User in setup-template.json
+- Create Policy for AppRunner User in prepare-template.json
 	- Pass SSM Role 
 	{
     "Effect": "Allow",
@@ -38,18 +63,18 @@
     "Resource": "arn:aws:iam::123456789012:role/my-role-for-XYZ"
 
 - Test other maps.
+- Verify that deleting of old cache remote config works.
 
 - 13.2
 	- Update Spigot + Spigot WE docker images
 	- Update other maps to 
 
-- Verify that deleting of old cache remote config works.
 - What to do with remaining parameters?
 	- Create Batch file to create new configs with compatible software version numbers?
 	  As part of setup_server.bat?
 	- master configuration with code versions? (AMI IDs, etc.)
 
-- secure configs
+- save/secure configs
 	- image building: /vagrant/set...
 	- clients
 	- How to distribute? Via s3, samba?
@@ -71,6 +96,8 @@ https://hub.docker.com/r/goofball222/murmur/
 https://octo.sh/container-library/murmur-docker
 https://github.com/mattikus/docker-murmur
 
+
+- Why das server shutdown message first appear after graceful shutdown timeout?
 
 - Add IPv6 support.
    - security group

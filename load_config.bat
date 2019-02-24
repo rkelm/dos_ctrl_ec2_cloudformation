@@ -59,6 +59,11 @@ IF ERRORLEVEL 1 (
 	ECHO Could not download remote configuration file %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE%
     GOTO:eof
 	) 
+REM Update file date to remember how current the file is.
+CD config\cached
+COPY /Y /B config\cached\%REMOTE_CONFIG_FILE%+,,
+CD ..\..
+
 GOTO load_cached_config_file
 
 :http_download
@@ -75,6 +80,10 @@ IF ERRORLEVEL 1 (
 	ECHO Could not download remote configuration file %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE%
     GOTO:eof
 	) 
+REM Update file date to remember how current the file is.
+CD config\cached
+COPY /Y /B config\cached\%REMOTE_CONFIG_FILE%+,,
+CD ..\..
 
 :load_cached_config_file
 ECHO Loading cached config file 
