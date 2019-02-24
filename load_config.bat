@@ -38,7 +38,7 @@ IF %_FIRSTCHARS%==http: GOTO check_cache
 GOTO remote_config_is_local
 
 :check_cache
-ECHO Checking for cached remote config file.
+REM ECHO Checking for cached remote config file.
 REM Create directory for caching configs.
 IF NOT EXIST config\cached mkdir config\cached
 
@@ -86,7 +86,7 @@ COPY /Y /B config\cached\%REMOTE_CONFIG_FILE%+,,
 CD ..\..
 
 :load_cached_config_file
-ECHO Loading cached config file 
+REM ECHO Loading cached config file 
 CALL config\cached\%REMOTE_CONFIG_FILE%
 
 

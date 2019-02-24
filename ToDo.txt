@@ -1,24 +1,15 @@
 ﻿# To-Do:
 
-- commit & push all
-	- srv_ctrl
-	- vanilla
-	- cf_cmds
-	
 - Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
 	- Rename / Integrate / Test MC commands from dos_ctrl_docker_minecraft
-		- docmc_cmd
-		- docmc_launch
 		- terminate
 		- OnDeleteStack: Save Running Map!
+		- docmc_launch
 		- savemap
-		- runmap
 		- Kick
 		- whitelist 3x
 		- punish
 		- ipconfig /flushdns batch
-
-- Does config file caching work.
 
 - Clean up docker_bakery
 	- push all changes
