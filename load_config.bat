@@ -61,7 +61,7 @@ IF ERRORLEVEL 1 (
 	) 
 REM Update file date to remember how current the file is.
 CD config\cached
-COPY /Y /B config\cached\%REMOTE_CONFIG_FILE%+,,
+COPY /Y /B %REMOTE_CONFIG_FILE%+,,
 CD ..\..
 
 GOTO load_cached_config_file
