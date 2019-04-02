@@ -34,7 +34,7 @@ IF NOT DEFINED URL_MAP_ID_FILE (
 	EXIT /b 1
 )
 
-%CURL_BIN% -s %URL_MAP_ID_FILE% > map_ids.txt
+%CURL_BIN% %CURL_OPTIONS% -s %URL_MAP_ID_FILE%  > map_ids.txt
 IF ERRORLEVEL 1 (
   ECHO Konnte die Map-Liste nicht von %URL_MAP_ID_FILE% laden.
   PAUSE
