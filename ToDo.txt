@@ -1,26 +1,42 @@
 ﻿# To-Do:
+- get spigot directory layout
+	- Test spigot image 
+	- Test spigot we image -> Does not run? -> check per SSH to ec2 instance
+	- git docker_images commit & push
+mapdata
+	server
+		logs				L
+		server.properties 			C
+		*.json 						C
+		*.yml						C
+		app.jar 				A
+		plugins					A
+			plugin1.jar			A
+			plugin2.jar			A
+			WorldEdit
+				config.yml			C
+				schematics	D  (Volume with S3-Driver)
+				sessions	D
+			WorldGuard
+				config.yml			C
+				cache		D
+				worlds
+					world_the_end 	C (blacklist.txt, config.yml)
+					world_nether	C
+					world			C
 
-- Integrate into dos_ctrl_ec2 + dos_ec2_docker_minecraft
-	- Rename / Integrate / Test MC commands from dos_ctrl_docker_minecraft
-		- terminate
-		- OnDeleteStack: Save Running Map!
-		- docmc_launch
-		- savemap
-		- Kick
-		- whitelist 3x
-		- punish
-		- ipconfig /flushdns batch
+		world				D
+		world_nether		D
+		world_the_end		D
 
-- Clean up docker_bakery
-	- push all changes
-	- retest
-	- one install should be enough
 
-- Update other images.
+- Update all other images.
   - correct: passing each build env var with --build-arg parameter
   - move bukkit to other directory than server?
+  - install ps tool in vanilla_minecraft.
 
 - Update other maps:
+    - create two repos for vanilla & bukkit base map.
 	- add eula=true
 	- change world directory layout
 	- update cocker-compose.yml
@@ -34,6 +50,8 @@
 - TEST all new images and all new maps.
 
 - commit and push all!!
+
+- Add batch script for running overviewer batch jobs
 
 - Make DNSHOSTNAME optional in run_Template.json
 - DockerRunnerPolicy: Supply route53 Resource as parameter (arn:aws:route53:::hostedzone/hosted zone ID)
@@ -77,6 +95,7 @@
 	- Prepare client configs
 	- Deploy to clients
 	- Update MC Clients with VoxelMap
+	- add badges to github readme
 
 - Write Setup instructions
 	- Setup ECR
