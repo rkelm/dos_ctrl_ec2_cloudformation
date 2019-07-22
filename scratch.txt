@@ -1,3 +1,29 @@
+       
+# Recreate fifo
+[ -e "$fifo" ] && as_user "rm $fifo"
+as_user "mkfifo $fifo"
+
+# Start server 
+as_user "tail -n +1 -f --pid=\$$ $fifo | { $java $invocation nuid=$name-nuid &> $log; kill \$$; }" &> /dev/null &
+
+ tail -n +1 -f --pid=$$ console.input | { java  -Xmx2048M -jar spigot-1.13.2.2019-06-02.jar nogui; kill $$; } &
+
+ tail -n +1 -f --pid $$ /opt/mc/console.in | { java -Xmx2048M -jar /opt/mc/jar/minecraft_server.1.13.2.jar nogui; kill $$; }
+
+# Send command to server
+as_user "printf \"%s\n\" \"$1\" > $fifo"
+
+
+#!/bin/sh
+
+# redirect stdout and stderr to files
+exec >/log/stdout.log
+exec 2>/log/stderr.log
+
+# now run the requested CMD without forking a subprocess
+exec "$@"
+
+
 ,
             "Export": {
                 "Name": {
@@ -58,3 +84,53 @@
 
 run_map.sh:    ${bin_dir}/compose_up.sh
 compose_up.sh:"$docker_compose" -f "${map_data_dir}/docker-compose.yml" up -d
+
+- create two repos for vanilla & bukkit base map.
+- get spigot directory layout
+	- Test spigot image 
+	- Test spigot we image -> Does not run? -> check per SSH to ec2 instance
+	- git docker_images commit & push
+mapdata
+	server
+		logs				L
+		server.properties 			C
+		*.json 						C
+		*.yml						C
+		app.jar 				A
+		plugins					A
+			plugin1.jar			A
+			plugin2.jar			A
+			WorldEdit
+				config.yml			C
+				schematics	D  (Volume with S3-Driver)
+				sessions	D
+			WorldGuard
+				config.yml			C
+				cache		D
+				worlds
+					world_the_end 	C (blacklist.txt, config.yml)
+					world_nether	C
+					world			C
+
+		world				D
+		world_nether		D
+		world_the_end		D
+
+    image: "188892360808.dkr.ecr.eu-central-1.amazonaws.com/spigot_we_minecraft_2:1.13.2"
+    restart: "no"
+    stop_grace_period: 2m
+    ports:
+      - ${HOST_MCPORT}:25565
+    volumes:
+      - vmaps:/opt/mc/server
+      - vlogs:/opt/mc/server/logs
+    command: ["/opt/mc/bin/run_java_app.sh"]
+
+volumes:
+  vmaps:
+    external:
+      name: ${HOST_NAMEDVOLUME_MAPS}
+  vlogs:
+    external:
+      name: ${HOST_NAMEDVOLUME_LOGS}
+

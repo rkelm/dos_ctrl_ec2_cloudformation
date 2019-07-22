@@ -1,45 +1,61 @@
 ﻿# To-Do:
-- get spigot directory layout
-	- Test spigot image 
-	- Test spigot we image -> Does not run? -> check per SSH to ec2 instance
-	- git docker_images commit & push
-mapdata
-	server
-		logs				L
-		server.properties 			C
-		*.json 						C
-		*.yml						C
-		app.jar 				A
-		plugins					A
-			plugin1.jar			A
-			plugin2.jar			A
-			WorldEdit
-				config.yml			C
-				schematics	D  (Volume with S3-Driver)
-				sessions	D
-			WorldGuard
-				config.yml			C
-				cache		D
-				worlds
-					world_the_end 	C (blacklist.txt, config.yml)
-					world_nether	C
-					world			C
 
-		world				D
-		world_nether		D
-		world_the_end		D
+* Test spigot, spigot_we
+	- Does correct start and termination work? How fast is the shutdown?
+	- Does logging to stdout work?
+	- Is the pid in pid.txt the right one for the jvm?
+	- Test 100% CPU problem. Is it fixed?
+	- Test: Are the plugins recognised?
+	- Does deleting links to plugins work? (unprepare_java_app.sh)
+
+* Shutting down spigot image takes a long time. 
+	- Maybe unprepare script has an error?
+	- Server is down, but script seems to still be running.
+	- Why das server shutdown message first appear after graceful shutdown timeout?
+  	  Maybe because of missing ps command? Fixed!
+
+* Rename images?
+	- Remove unused images in AWS ECR.
+
+* op-world liefert folgenden fehler:
+Looking for map_id in map repository.
+Found map with map_id 10yearsofmc_vanilla2_1-14-2 in map repository.
+Getting subdomain for map_id 10yearsofmc_vanilla2_1-14-2.
+Retrieved subdomain name 10yearsofmc.ps-ev.de.
+Saving map op-world_spigot-we2_1-13-2.
+Error: connection failed (127.0.0.1).
+Error: connection failed (127.0.0.1).
+Error: connection failed (127.0.0.1).
+Error: connection failed (127.0.0.1).
+Error: connection failed (127.0.0.1).
+Error: connection failed (127.0.0.1).
+Stopping Server.
+Error: connection failed (127.0.0.1).
+Terminating Server.
+Stopping map_data_mc_1 ...
+[1BRemoving map_data_mc_1 ... mdone[0m
+[1BRemoving network map_data_default[0m
+Storing map op-world_spigot-we2_1-13-2.
+Server not running.
+Storing map op-world_spigot-we2_1-13-2.
+Uploading op-world_spigot-we2_1-13-2.tgz
+Completed 5.8 MiB/18.1 MiB (24.3 MiB/s) with 1 file(s) remaining
+---Output truncated---
+Drücken Sie eine beliebige Taste . . .
 
 
-- Update all other images.
-  - correct: passing each build env var with --build-arg parameter
-  - move bukkit to other directory than server?
-  - install ps tool in vanilla_minecraft.
+* Minenspass: Worldguard und Worldedit gehen nicht.
+  => Falsches image in docker-compose.yml. Fixed.
+  Vorher Test ob plugins funktionieren.
 
-- Update other maps:
-    - create two repos for vanilla & bukkit base map.
+* --forceUpgrade erneut durchführen.
+  JAVA_PARAM_SUFFIX=--forceUpgrade nogui
+  in docker-compose.yml
+
+* Update other maps:
+	- change world directory layout: No worlds/* directory for spigot.
 	- add eula=true
-	- change world directory layout
-	- update cocker-compose.yml
+	- update docker-compose.yml
       - change compose file version to version: "3"
 		- Better external with name, else projectname gets appended?
 			volumes:
@@ -47,11 +63,19 @@ mapdata
 				external: 
 				name: dfadf
 
-- TEST all new images and all new maps.
+- Show connection string with port number after loading a map.
+
+- Bug: dos_ctrl_ec2: Kick.bat not working. Window closes too fast?
+
+- Which commands are missing? cfmc_punish?
+
+- Add batch script for running overviewer batch jobs
+  The path of the worlds have changed! Not a subdirectory of world anymore.
 
 - commit and push all!!
 
-- Add batch script for running overviewer batch jobs
+
+- Srv tools: add flock to protect against parallel execution
 
 - Make DNSHOSTNAME optional in run_Template.json
 - DockerRunnerPolicy: Supply route53 Resource as parameter (arn:aws:route53:::hostedzone/hosted zone ID)
@@ -62,6 +86,9 @@ mapdata
 - Test prepare and unprepare of stack.
 
 - Create Policy for AppRunner User in prepare-template.json
+	- Limit ec2 and other Resources, Limit to resources defined in config? 
+		-> After change prepare script must be called again and policy reassigned to user.
+		=> Better not.
 	- Pass SSM Role 
 	{
     "Effect": "Allow",
@@ -71,12 +98,7 @@ mapdata
     ],
     "Resource": "arn:aws:iam::123456789012:role/my-role-for-XYZ"
 
-- Test other maps.
 - Verify that deleting of old cache remote config works.
-
-- 13.2
-	- Update Spigot + Spigot WE docker images
-	- Update other maps to 
 
 - What to do with remaining parameters?
 	- Create Batch file to create new configs with compatible software version numbers?
@@ -91,30 +113,31 @@ mapdata
 - Release 0.1
 	- Test build.bat
 	- Build package
-	- Publish client install package
-	- Prepare client configs
+	- Publish client install package (s3, link from github?)
+	- Prepare client configs (s3 or lan server?)
 	- Deploy to clients
-	- Update MC Clients with VoxelMap
-	- add badges to github readme
 
 - Write Setup instructions
 	- Setup ECR
+	- add badges to github readme
 		- setup resource based policy 
 
-- Setup Murmur server 
+- Setup Clients with https://github.com/SKCraft/Launcher ?
+	- Update MC Clients with VoxelMap
+	- Add Mumur mod for minecraft?
+
+- Setup Murmur server or use Discord?
 https://hub.docker.com/r/goofball222/murmur/
 https://octo.sh/container-library/murmur-docker
 https://github.com/mattikus/docker-murmur
 
+- Common config file.
+	- contains docker image name -> take compose.yml out of map.tgz.
+	- ?
 
-- Why das server shutdown message first appear after graceful shutdown timeout?
 
-- Add IPv6 support.
-   - security group
-   - instance ssh
-   - MC server
-
-- Bug: dos_ctrl_ec2: Kick.bat not working. Window closes too fast?
+- Log to AWS CloudWatch
+	- Remove Log Mounts?
 
 - CF Template to create S3 Buckets -> move to overviewer project
 	- mc-private/maps  (Keep secrets here?)
@@ -124,3 +147,29 @@ https://github.com/mattikus/docker-murmur
 		- /index.html
 		- /map_ids.txt
 		- /robots.txt
+
+- Create 1.14.3 Image
+
+- Add tools to add, remove, change worlds
+	- update map_ids.txt from s3 inventory?
+	- remove map from s3
+	- copy map to new name
+	- change a maps docker image
+	- change a maps server.properties?
+	- change what else?
+	- add map a from local map files
+		- vanilla
+		- spigot
+	- What more is needed?
+	- Create 10 Years of Minecraft map
+
+- Add release number for images ad tags
+	- Add MC release number to name of image: mc_vanilla_1-13-2:1.2-beta
+
+- Add CraftBook Mod to server images
+
+- Add IPv6 support.
+   - security group
+   - instance ssh
+   - MC server
+
