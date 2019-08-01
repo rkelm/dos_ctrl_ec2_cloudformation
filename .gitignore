@@ -9,4 +9,8 @@
 /run-stack.txt
 /map_ids.txt
 /map_ids2.txt
-
+/*.lnk
+/job_id.txt
+/renderjobdef.txt
+/renderjobqueue.txt
+/defaultvpc.txt
