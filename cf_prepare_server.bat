@@ -22,17 +22,43 @@ CALL load_config.bat %_CONFIG%
 
 IF ERRORLEVEL 2 EXIT /B 1
 
+REM Load credentials for user with extended privileges.
+IF NOT [%CREDENTIALSFILE_EXTENDED%] == [] (
+ 	IF EXIST "%CREDENTIALSFILE_EXTENDED%" (
+		CALL "%CREDENTIALSFILE_EXTENDED%"
+		)
+	)
+
 REM Upload CloudFormation Templates
 REM %AWS_BIN% --region %REGION% s3 cp prepare-template.json s3://%MAP_BUCKET%/prepare-template.json
 REM %AWS_BIN% --region %REGION% s3 cp run-template.json s3://%MAP_BUCKET%/run-template.json
+
+REM Get default vpc and default subnet.
+%AWS_BIN% --region %REGION%  ec2 describe-vpcs --filters Name=isDefault,Values=true --query Vpcs[0].VpcId --output text > defaultvpc.txt
+SET /P _DEFAULTVPC=<defaultvpc.txt
+IF NOT DEFINED _DEFAULTVPC (
+  ECHO No defaut vpc found. Please create a default vpc. Exiting.
+  EXIT /B 1
+)
+
+REM %AWS_BIN% --region %REGION%  ec2 describe-subnets --filters 'Name=vpc-id,Values=<default vpc-id>' 'Name=DefaultForAz,Values=true'
 
 REM Create prepared CloudFormation Stack
 ECHO Creating prepared stack...
 %AWS_BIN% --region %REGION% cloudformation create-stack --stack-name %STACKNAME%-Prepared ^
   --template-body file://prepare-template.json ^
-  --parameters ParameterKey=MCMapBucketName,ParameterValue=%MAP_BUCKET% ^
+  --parameters ParameterKey=MCMapBucket,ParameterValue=%MAP_BUCKET% ^
     ParameterKey=MCSNSEmailAddress,ParameterValue=%ADMIN_EMAIL% ^
     ParameterKey=StackAlias,ParameterValue=%_CONFIG% ^
+    ParameterKey=MCMapBucketDir,ParameterValue=%MAP_S3_KEY% ^
+    ParameterKey=MCPubBucket,ParameterValue=%PUB_BUCKET% ^
+    ParameterKey=MCPubBucketDir,ParameterValue=%PUB_S3_DIR% ^
+    ParameterKey=MCRenderCacheBucket,ParameterValue=%RENDER_CACHE_BUCKET% ^
+    ParameterKey=MCRenderCacheBucketDir,ParameterValue=%RENDER_CACHE_S3_DIR% ^
+    ParameterKey=GoogleApiKey,ParameterValue=%GOOGLE_API_KEY% ^
+    ParameterKey=ExistingVpcId,ParameterValue=%_DEFAULTVPC% ^
+    ParameterKey=MCExistingSubnetId,ParameterValue=%RENDER_SUBNET_ID% ^
+    ParameterKey=MCSubnetIDv4Cidr,ParameterValue=%RENDER_SUBNET_CIDR% ^
   --capabilities CAPABILITY_IAM --on-failure DELETE ^
   --tags Key=%TAGKEY%,Value=%TAGVALUE% ^
   --output text

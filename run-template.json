@@ -108,7 +108,12 @@
         "HostSubdomain": {
             "Description": "Name of route53 recordset to assign to instance's public ip address. (Needs a dot at the end.)",
             "Type": "String",
-            "Default": "."
+            "Default": "host.domain.com."
+        },
+        "MCHostedZoneName": {
+            "Description": "Name of the existing route53 hosted zone. As specified in the HostSubdomain parameter.",
+            "Type": "String",
+            "Default": "domain.com."
         },
         "ContainerVolumeRoot": {
             "Description": "Containers path to root with volumes.",
@@ -150,7 +155,7 @@
             "Default": "mc-map"
         },
         "StackAlias": {
-            "Description": "",
+            "Description": "Suffix for names of outputs created in this template.",
             "Type": "String",
             "MinLength": "1"
         }
@@ -472,11 +477,6 @@
                         }
                     }
                 ]
-            },
-            "Metadata": {
-                "AWS::CloudFormation::Designer": {
-                    "id": "2dd359ca-8b4c-4a82-b057-3b3aadbf209e"
-                }
             }
         },
         "McServerInstance": {
@@ -769,7 +769,9 @@
         "HostDNSRecord": {
             "Type": "AWS::Route53::RecordSet",
             "Properties": {
-                "HostedZoneName": "ps-ev.de.",
+                "HostedZoneName": {
+                    "Ref": "MCHostedZoneName"
+                },
                 "Name": {
                     "Ref": "HostSubdomain"
                 },
@@ -802,34 +804,6 @@
                         }
                     ]
                 ]
-            }
-        }
-    },
-    "Metadata": {
-        "AWS::CloudFormation::Designer": {
-            "b6509286-977b-4824-90ec-115b903556f2": {
-                "size": {
-                    "width": 60,
-                    "height": 60
-                },
-                "position": {
-                    "x": 60,
-                    "y": 90
-                },
-                "z": 1,
-                "embeds": []
-            },
-            "2dd359ca-8b4c-4a82-b057-3b3aadbf209e": {
-                "size": {
-                    "width": 60,
-                    "height": 60
-                },
-                "position": {
-                    "x": 180,
-                    "y": 90
-                },
-                "z": 1,
-                "embeds": []
             }
         }
     }

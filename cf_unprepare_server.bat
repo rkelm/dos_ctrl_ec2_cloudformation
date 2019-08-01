@@ -21,6 +21,15 @@ CALL load_config.bat %_CONFIG%
 
 IF ERRORLEVEL 2 EXIT /B 1
 
+REM Load credentials for user with extended privileges.
+IF NOT [%CREDENTIALSFILE_EXTENDED%] == [] (
+ 	IF EXIST "%CREDENTIALSFILE_EXTENDED%" (
+		CALL "%CREDENTIALSFILE_EXTENDED%"
+		)
+	)
+
+ECHO ### Remember to remove the stack policies from aws users and aws user groups before ###
+ECHO ### running this script, else deleting stack will fail. ###
 REM Delete prepared CloudFormation Stack
 ECHO Deleting prepared stack...
 %AWS_BIN% --region %REGION% cloudformation delete-stack --stack-name %STACKNAME%-Prepared ^

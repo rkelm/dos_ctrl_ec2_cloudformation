@@ -89,3 +89,12 @@ REM To specifiy RCON passwort used for authenticating to rcon
 REM of MC server, else the build time default RCON password is
 REM used. (optional)
 SET RCONPWD=
+
+
+REM This link is shown to the user.
+SET URL_MAP_OVERVIEW=http://mc-pub.kelm.net/
+
+REM Configuration variables for AWS Batch Job to create map overview.
+SET BATCH_RENDER_JOB_QUEUE=StandardJobQueue
+SET BATCH_RENDER_JOB_DEFINITION=McOverviewerUpdateMap:4
+SET BATCH_RENDER_JOB_NAME=McRenderMap

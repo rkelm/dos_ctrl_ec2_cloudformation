@@ -1,87 +1,84 @@
 ﻿# To-Do:
 
-* Test spigot, spigot_we
-	- Does correct start and termination work? How fast is the shutdown?
-	- Does logging to stdout work?
-	- Is the pid in pid.txt the right one for the jvm?
-	- Test 100% CPU problem. Is it fixed?
-	- Test: Are the plugins recognised?
-	- Does deleting links to plugins work? (unprepare_java_app.sh)
+*** Fix ctrl commands for mvp version ***
 
-* Shutting down spigot image takes a long time. 
-	- Maybe unprepare script has an error?
-	- Server is down, but script seems to still be running.
-	- Why das server shutdown message first appear after graceful shutdown timeout?
-  	  Maybe because of missing ps command? Fixed!
+- commit and push all!! 
 
-* Rename images?
-	- Remove unused images in AWS ECR.
+* Release 0.1
+	- Test build.bat
+	- Build package
+	- Publish client install package (syno, s3, link from github?)
+	- Prepare client configs (s3 or lan server?)
+	- Deploy to clients
+	- Tag code
+	- Add a github release?
 
-* op-world liefert folgenden fehler:
-Looking for map_id in map repository.
-Found map with map_id 10yearsofmc_vanilla2_1-14-2 in map repository.
-Getting subdomain for map_id 10yearsofmc_vanilla2_1-14-2.
-Retrieved subdomain name 10yearsofmc.ps-ev.de.
-Saving map op-world_spigot-we2_1-13-2.
-Error: connection failed (127.0.0.1).
-Error: connection failed (127.0.0.1).
-Error: connection failed (127.0.0.1).
-Error: connection failed (127.0.0.1).
-Error: connection failed (127.0.0.1).
-Error: connection failed (127.0.0.1).
-Stopping Server.
-Error: connection failed (127.0.0.1).
-Terminating Server.
-Stopping map_data_mc_1 ...
-[1BRemoving map_data_mc_1 ... mdone[0m
-[1BRemoving network map_data_default[0m
-Storing map op-world_spigot-we2_1-13-2.
-Server not running.
-Storing map op-world_spigot-we2_1-13-2.
-Uploading op-world_spigot-we2_1-13-2.tgz
-Completed 5.8 MiB/18.1 MiB (24.3 MiB/s) with 1 file(s) remaining
----Output truncated---
-Drücken Sie eine beliebige Taste . . .
+* Prepare Client installs
+	- Put on Esterh/Alex drive
+		- srv_ctrl tools 
+		- MultiMC setup
+		- download MultiMC Setup for 1.14.4 to fileserver
 
+* Setup Clients
+	- Inspiron Esther/Alex/Papa
+	- Elitebk Esther/Alex/Papa
+	- Lenovo Esther/Alex/Papa
+	- Setup cloudformation client
+	- MultiMC 1.14.4
+	- Update MC Clients with VoxelMap (??)
 
-* Minenspass: Worldguard und Worldedit gehen nicht.
-  => Falsches image in docker-compose.yml. Fixed.
-  Vorher Test ob plugins funktionieren.
+* Load schematics file in 1.12.2 version
+  Load schematic file first! => Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
 
-* --forceUpgrade erneut durchführen.
+* Convert Minenspass to 1.13.2
+   --forceUpgrade erneut durchführen.
   JAVA_PARAM_SUFFIX=--forceUpgrade nogui
   in docker-compose.yml
 
-* Update other maps:
-	- change world directory layout: No worlds/* directory for spigot.
-	- add eula=true
-	- update docker-compose.yml
-      - change compose file version to version: "3"
-		- Better external with name, else projectname gets appended?
-			volumes:
-			data:
-				external: 
-				name: dfadf
+* Create spigot / spigot-we docker images for 1.14.4
+	- Update Minenspass to 14.4, regenerate blocks
+	- Update map_ids2.txt
 
+* Create Homepage with JS reading map_ids2.txt 
+
+
+*** MMP Version ***
 - Show connection string with port number after loading a map.
-
-- Bug: dos_ctrl_ec2: Kick.bat not working. Window closes too fast?
-
-- Which commands are missing? cfmc_punish?
-
-- Add batch script for running overviewer batch jobs
-  The path of the worlds have changed! Not a subdirectory of world anymore.
-
-- commit and push all!!
-
-
 - Srv tools: add flock to protect against parallel execution
+- Log to AWS CloudWatch
+	- Remove Log Mounts?
+- Setup html page for each important maps with links and information 
+- Create a central map registry as a JSON file with information on running a map.
+	- information from composer.yml file
+	- name of map
+	- subdomain
+- Add tools to add, remove, change worlds (in python!)
+	- update map_ids.txt from s3 inventory?
+	- remove map from s3
+	- copy map to new name
+	- change a maps docker image
+	- change a maps server.properties?
+	- change what else?
+	- view map s3 history (versioning)
+	- revert map from s3 history (versioning)
+	- add map a from local map files
+		- vanilla
+		- spigot
+	- What more is needed?
+- Add release number for images and tags
+	- Add MC release number to name of image: mc_vanilla_1-13-2:1.2-beta
+- Add badges to github readme.md's
+- Check and complete readme.md's
 
+
+*** Luxury Features ***
 - Make DNSHOSTNAME optional in run_Template.json
 - DockerRunnerPolicy: Supply route53 Resource as parameter (arn:aws:route53:::hostedzone/hosted zone ID)
 
 - Test not defining a SSH Key
 	- Remove SSH (Port20)  from security group if no key given.
+
+- Remove rediculously oversized machines from template.
 
 - Test prepare and unprepare of stack.
 
@@ -98,47 +95,20 @@ Drücken Sie eine beliebige Taste . . .
     ],
     "Resource": "arn:aws:iam::123456789012:role/my-role-for-XYZ"
 
-- Verify that deleting of old cache remote config works.
+- setup resource based policy 
 
+*** Configuration management ***
 - What to do with remaining parameters?
 	- Create Batch file to create new configs with compatible software version numbers?
 	  As part of setup_server.bat?
 	- master configuration with code versions? (AMI IDs, etc.)
-
 - save/secure configs
 	- image building: /vagrant/set...
 	- clients
 	- How to distribute? Via s3, samba?
-
-- Release 0.1
-	- Test build.bat
-	- Build package
-	- Publish client install package (s3, link from github?)
-	- Prepare client configs (s3 or lan server?)
-	- Deploy to clients
-
-- Write Setup instructions
-	- Setup ECR
-	- add badges to github readme
-		- setup resource based policy 
-
-- Setup Clients with https://github.com/SKCraft/Launcher ?
-	- Update MC Clients with VoxelMap
-	- Add Mumur mod for minecraft?
-
-- Setup Murmur server or use Discord?
-https://hub.docker.com/r/goofball222/murmur/
-https://octo.sh/container-library/murmur-docker
-https://github.com/mattikus/docker-murmur
-
 - Common config file.
 	- contains docker image name -> take compose.yml out of map.tgz.
 	- ?
-
-
-- Log to AWS CloudWatch
-	- Remove Log Mounts?
-
 - CF Template to create S3 Buckets -> move to overviewer project
 	- mc-private/maps  (Keep secrets here?)
 	- mc-render-cache/render-cache
@@ -148,23 +118,13 @@ https://github.com/mattikus/docker-murmur
 		- /map_ids.txt
 		- /robots.txt
 
-- Create 1.14.3 Image
+*** Other ***
+- Setup Murmur server or use Discord?
+https://hub.docker.com/r/goofball222/murmur/
+https://octo.sh/container-library/murmur-docker
+https://github.com/mattikus/docker-murmur
 
-- Add tools to add, remove, change worlds
-	- update map_ids.txt from s3 inventory?
-	- remove map from s3
-	- copy map to new name
-	- change a maps docker image
-	- change a maps server.properties?
-	- change what else?
-	- add map a from local map files
-		- vanilla
-		- spigot
-	- What more is needed?
-	- Create 10 Years of Minecraft map
-
-- Add release number for images ad tags
-	- Add MC release number to name of image: mc_vanilla_1-13-2:1.2-beta
+- Setup ECR
 
 - Add CraftBook Mod to server images
 
@@ -173,3 +133,69 @@ https://github.com/mattikus/docker-murmur
    - instance ssh
    - MC server
 
+* test spigot map will not allow client connections, why? 
+	- maybe its the spigot docker image?
+
+* Allow Remote rcon connections 
+	- Is rights management for different rcon users possible?
+
+* Unicode conversion Problem in mcrcon?
+C:\Users\Rober\work\aws_mc_srv\dos_ctrl_ec2_cloudformation>cf_send_cmd.bat TEST app_cmd.sh /help
+Results in => 'charmap' codec can't encode character u'\ufffd' in position 0: character maps to <undefined>
+
+* Autosave map to s3 in map dependent intervalls
+
+* Render_map.sh: Make number of lower tile layers to delete a parameter, currently the 2 layers are deleted.
+
+* Explicitly create a dedicated VPC and subnets for running MC Server instead of using the default vpc and subnets.
+* Does MCRenderTaskRole really need "Effect": "Allow", "Action": "batch:SubmitJob" ?
+ 
+* docker_image_render_batch: use docker secret for google_api_key(env var GOOGLE_API_KEY_FILE)  (or remove if api key is redundant now)
+* Create mcrunner user in cf prepare-template, save access key to config file?
+* Common tag for all created resources of one config.
+* Create docker repositories in prepare-template => images lost wenn recreated
+* Create AWS test account
+* docker image overviewer batch: automate mc client download depending on version requested
+* batch file to check for updates & install automatically
+	- Write Setup instructions
+	- Upload script for package & configs
+	- Check for Update on launching an instance
+
+* Copy run-template.json to s3 and only allow creating stack with this template?
+* Policy for user creating run-stack and role of created ec2 instance are mixed up. => Seperate in two policies.
+
+RunnerPolicy removed:
+                        {
+                            "Effect": "Allow",
+                            "Action": "ec2:RunInstances",
+                            "Resource": [
+                                "arn:aws:ec2:::image/ami-*"
+                            ],
+                            "Condition": {
+                                "StringEquals": {
+                                    "ec2:Owner": "amazon"
+                                }
+                            }
+                        },     
+						                        {
+                            "Effect": "Allow",
+                            "Action": "ec2:RunInstances",
+                            "Resource": [
+                                "arn:aws:ec2::*:instance/*"
+                            ],
+                            "Condition": {
+                                "StringEquals": {
+                                    "ec2:InstanceType": [
+                                        "c5.large",
+                                        "c5.xlarge",
+                                        "c4.large",
+                                        "c4.xlarge",
+                                        "t2.large",
+                                        "t2.medium",
+                                        "t2.small",
+                                        "t2.micro"
+                                    ]
+                                }
+                            }
+                        },
+* Limit route53 commands to the domain spefied during prepare step.           

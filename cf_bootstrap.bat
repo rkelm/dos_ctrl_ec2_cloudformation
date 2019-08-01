@@ -87,6 +87,9 @@ IF NOT [%IMAGEID%] == [] (
 IF DEFINED DNSHOSTNAME (
   REM Add dot to DNSHOSTNAME, if Hostname is configured.
   SET _DNSHOSTNAME=ParameterKey=HostSubdomain,ParameterValue=%DNSHOSTNAME%.
+
+  FOR /F "delims=. tokens=1,*" %%G IN ("%DNSHOSTNAME%.") DO SET _HOSTSUBDOMAIN=%%H
+  SET _DNSHOSTNAME=!_DNSHOSTNAME! ParameterKey=MCHostedZoneName,ParameterValue=!_HOSTSUBDOMAIN!
 )
 
 REM Launch Amazon Linux Instance. Run prepare_server.sh on server.
