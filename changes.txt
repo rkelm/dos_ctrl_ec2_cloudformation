@@ -1,2 +1,3 @@
 v0.1
+Added setup_shortcuts.bat to create shortcuts for Microsoft Windows.
 Created from dos_ec2_docker_minecraft and dos_ctrl_ec2.
