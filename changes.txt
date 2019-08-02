@@ -1,0 +1,2 @@
+v0.1
+Created from dos_ec2_docker_minecraft and dos_ctrl_ec2.
