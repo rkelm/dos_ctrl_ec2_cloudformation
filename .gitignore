@@ -1,5 +1,6 @@
 /config/
 /utils/
+/build/
 /prepared-stack.txt
 /dos_ctrl_ec2.log
 /cmd_status.txt

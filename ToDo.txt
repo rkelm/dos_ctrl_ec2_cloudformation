@@ -2,19 +2,16 @@
 
 *** Fix ctrl commands for mvp version ***
 
-- commit and push all!! 
-
 * Release 0.1
-	- Test build.bat
+	- commit & tag code
 	- Build package
 	- Publish client install package (syno, s3, link from github?)
 	- Prepare client configs (s3 or lan server?)
 	- Deploy to clients
-	- Tag code
 	- Add a github release?
 
 * Prepare Client installs
-	- Put on Esterh/Alex drive
+	- Put on Esther/Alex drive
 		- srv_ctrl tools 
 		- MultiMC setup
 		- download MultiMC Setup for 1.14.4 to fileserver
@@ -41,6 +38,7 @@
 
 * Create Homepage with JS reading map_ids2.txt 
 
+* Rename git repository to something with minecraft server and ec2.
 
 *** MMP Version ***
 - Show connection string with port number after loading a map.
