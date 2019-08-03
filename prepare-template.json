@@ -21,7 +21,7 @@
             "Type": "String",
             "MinLength": "1"
         },
-        "ContainerImage": {
+        "RenderContainerImage": {
             "Description": "Name of the container image to run when rendering the world.",
             "Type": "String",
             "MinLength": "2",
@@ -379,7 +379,7 @@
             "ContainerProperties": {
                 "MountPoints": [],
                 "Image": {
-                    "Ref": "ContainerImage"
+                    "Ref": "RenderContainerImage"
                 },
                 "Command": [
                 "render_map.sh",
