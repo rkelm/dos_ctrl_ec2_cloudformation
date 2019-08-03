@@ -2,28 +2,36 @@
 
 *** Fix ctrl commands for mvp version ***
 
-* Release 0.1.1
-	- Prepare client configs (s3 or lan server?)
-	- Deploy to clients
-
+* Release 0.1.2
+	- test
+	- commit
+	- build
 
 * Load schematics file in 1.12.2 version
-  Load schematic file first! => Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
+	- Size of image?
+	- Test on test_spigot_we2
+	- Load on minenspass
+  Load schematic file first!
 
 * Convert Minenspass to 1.13.2
    --forceUpgrade erneut durchführen.
   JAVA_PARAM_SUFFIX=--forceUpgrade nogui
   in docker-compose.yml
 
-* Create spigot / spigot-we docker images for 1.14.4
-	- Update Minenspass to 14.4, regenerate blocks
+* Convert to 1.14.4
+
+* regenerate or delete chunks of ocean and villages?
 	- Update map_ids2.txt
 
 * Create Homepage with JS reading map_ids2.txt 
 
 * Rename git repository to something with minecraft server and ec2.
 
+* prepare-template: Add config name to aws batch job queue
+
 *** MMP Version ***
+* Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
+
 * Add ECHO remark at the end of prepare batch that now the Minecraft runner aws iam user or its iam group 
 should be connected to the three new policies.
 - Show connection string with port number after loading a map.

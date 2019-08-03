@@ -17,7 +17,7 @@ REM ECHO %_CONFIGFILE%
 REM Check if local config file exists. If not complain.
 IF NOT EXIST %_CONFIGFILE% (
 	ECHO Konfigurationsdatei %_CONFIGFILE% nicht gefunden.
-	EXIT /B 1
+	EXIT /B 2
 	)
 
 REM Load configuration variables.
@@ -25,7 +25,7 @@ CALL %_CONFIGFILE%
 
 IF NOT DEFINED REMOTE_CONFIG_FILE (
   ECHO Es muss ein Wert fuer REMOTE_CONFIG_FILE in der lokalen Konfigurationsdatei angegeben werden.
-  EXIT /B 1
+  EXIT /B 2
 )
 
 REM Must remote config be downloaded?
@@ -72,7 +72,7 @@ REM Download from HTTP.
 REM Check for curl.
 IF NOT EXIST %CURL_BIN% (
 	ECHO %CURL_BIN% not found 
-	EXIT /b 1
+	EXIT /B 2
 )
 
 %CURL_BIN% -kso config\cached\%REMOTE_CONFIG_FILE% %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE%
