@@ -59,6 +59,7 @@ ECHO Creating prepared stack...
     ParameterKey=ExistingVpcId,ParameterValue=%_DEFAULTVPC% ^
     ParameterKey=MCExistingSubnetId,ParameterValue=%RENDER_SUBNET_ID% ^
     ParameterKey=MCSubnetIDv4Cidr,ParameterValue=%RENDER_SUBNET_CIDR% ^
+    ParameterKey=RenderContainerImage,ParameterValue=%BATCH_RENDER_IMAGE_NAME% ^
   --capabilities CAPABILITY_IAM --on-failure DELETE ^
   --tags Key=%TAGKEY%,Value=%TAGVALUE% ^
   --output text
