@@ -33,7 +33,7 @@ IF EXIST %INSTIDFILE% (
 
 	IF NOT [!INSTANCEID!] == [EMPTY] (
 		REM Ask aws if this is a known running/pending/shutting-down instance.
-		%AWS_BIN% ec2 describe-instances --filters Name=instance-state-name,Values=running,shutting-down,pending Name=instance-id,Values=!INSTANCEID! --output=text --query Reservations[*].Instances[*].InstanceId > output.txt
+		%AWS_BIN% --region %REGION% ec2 describe-instances --filters Name=instance-state-name,Values=running,shutting-down,pending Name=instance-id,Values=!INSTANCEID! --output=text --query Reservations[*].Instances[*].InstanceId > output.txt
 		SET OUTPUT=EMPTY
 		SET /P OUTPUT=<output.txt
 		IF NOT [!OUTPUT!] == [EMPTY] (
@@ -69,7 +69,7 @@ IF [%IMAGEID%] == [CURRENT] (
 	REM linux ami for x86_64 architecture and ebs in chosen aws region. Avoid release
 	REM candidate versions.
 	ECHO Kein ami Image konfiguriert, suche aktuellstes Image.
-    %AWS_BIN% ec2 describe-images --region %REGION% ^
+    %AWS_BIN% --region %REGION% ec2 describe-images ^
 	  --filters Name=root-device-type,Values=ebs Name=architecture,Values=x86_64 Name=virtualization-type,Values=hvm Name=name,Values=amzn-ami-hvm-2*gp2 Name=state,Values=available ^
 	  --owners amazon ^
 	  --query "Images[?^!contains(Name, '.rc-')]|sort_by(@, &CreationDate)[-1].[ImageId]" ^
@@ -81,7 +81,7 @@ IF [%IMAGEID%] == [CURRENT] (
 IF NOT [%IMAGEID%] == [] (
 	REM Show image details.
 	ECHO Details des ami Images mit der image-id %IMAGEID%:
-	%AWS_BIN% ec2 describe-images --region %REGION% --image-id %IMAGEID% --query "Images[].[ImageId, Name, CreationDate, RootDeviceName]" --output text
+	%AWS_BIN% --region %REGION% ec2 describe-images --image-id %IMAGEID% --query "Images[].[ImageId, Name, CreationDate, RootDeviceName]" --output text
 )
 
 IF DEFINED DNSHOSTNAME (

@@ -2,27 +2,10 @@
 
 *** Fix ctrl commands for mvp version ***
 
-* Release 0.1
-	- commit & tag code
-	- Build package
-	- Publish client install package (syno, s3, link from github?)
+* Release 0.1.1
 	- Prepare client configs (s3 or lan server?)
 	- Deploy to clients
-	- Add a github release?
 
-* Prepare Client installs
-	- Put on Esther/Alex drive
-		- srv_ctrl tools 
-		- MultiMC setup
-		- download MultiMC Setup for 1.14.4 to fileserver
-
-* Setup Clients
-	- Inspiron Esther/Alex/Papa
-	- Elitebk Esther/Alex/Papa
-	- Lenovo Esther/Alex/Papa
-	- Setup cloudformation client
-	- MultiMC 1.14.4
-	- Update MC Clients with VoxelMap (??)
 
 * Load schematics file in 1.12.2 version
   Load schematic file first! => Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
@@ -41,6 +24,8 @@
 * Rename git repository to something with minecraft server and ec2.
 
 *** MMP Version ***
+* Add ECHO remark at the end of prepare batch that now the Minecraft runner aws iam user or its iam group 
+should be connected to the three new policies.
 - Show connection string with port number after loading a map.
 - Srv tools: add flock to protect against parallel execution
 - Log to AWS CloudWatch
@@ -160,7 +145,8 @@ Results in => 'charmap' codec can't encode character u'\ufffd' in position 0: ch
 	- Check for Update on launching an instance
 
 * Copy run-template.json to s3 and only allow creating stack with this template?
-* Policy for user creating run-stack and role of created ec2 instance are mixed up. => Seperate in two policies.
+* Policy for user creating run-stack and role of created ec2 instance are mixed up. 
+    => Copy to two policies and then reduce permissions in each.
 
 RunnerPolicy removed:
                         {
@@ -197,3 +183,4 @@ RunnerPolicy removed:
                             }
                         },
 * Limit route53 commands to the domain spefied during prepare step.           
+* Add a github release?

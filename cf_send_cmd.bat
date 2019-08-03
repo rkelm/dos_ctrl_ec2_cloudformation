@@ -44,7 +44,7 @@ REM ECHO _SERVER_COMMAND %_SERVER_COMMAND%
 SET _INSTIDFILE=instanceid_%_CONFIG%.txt
 
 REM Check for running instance by searching for tag in aws cloud.
-%AWS_BIN% ec2 describe-instances ^
+%AWS_BIN% --region %REGION%  %ec2 describe-instances ^
   --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% ^
   --output=text ^
   --query Reservations[*].Instances[*].InstanceId > %_INSTIDFILE%
@@ -59,9 +59,9 @@ IF NOT EXIST %_INSTIDFILE% (
 SET /P _INSTANCEID=<%_INSTIDFILE%
 
 REM Send command.
-REM %AWS_BIN% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > commandid.txt
+REM %AWS_BIN% --region %REGION% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > commandid.txt
 
-%AWS_BIN% ssm send-command --instance-ids %_INSTANCEID% ^
+%AWS_BIN% --region %REGION% ssm send-command --instance-ids %_INSTANCEID% ^
   --document-name "AWS-RunShellScript" ^
   --parameters "{\"commands\":[\"%_SERVER_COMMAND%\"]}" ^
   --query Command.CommandId > commandid.txt
@@ -70,7 +70,7 @@ SET /P COMMANDID=<commandid.txt
 
 REM Wait till command execution terminates.
 :CMD_EXECUTION
-%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" ^
+%AWS_BIN% --region %REGION% ssm list-command-invocations --command-id "%COMMANDID%" ^
   --detail --query CommandInvocations[*].Status ^
   --output text > cmd_status.txt
 SET /P status=<cmd_status.txt
@@ -81,11 +81,11 @@ IF [%STATUS%]==[InProgress] (
 
 IF [%STATUS%] == "Success" (
 	REM Get command output.
-	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" ^
+	%AWS_BIN% --region %REGION% ssm list-command-invocations --command-id "%COMMANDID%" ^
 	  --detail --query CommandInvocations[*].CommandPlugins[*].Output ^
 	  --output text			
 ) ELSE (
-	%AWS_BIN% ssm list-command-invocations --command-id "%COMMANDID%" ^
+	%AWS_BIN% --region %REGION% ssm list-command-invocations --command-id "%COMMANDID%" ^
 	  --detail --query CommandInvocations[*].CommandPlugins[*].Output ^
 	  --output text		
 )
