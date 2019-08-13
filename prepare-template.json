@@ -5,7 +5,7 @@
         "MCMapBucket": {
             "Description": "The name of the s3 bucket used to store MC maps. It must be created via the console to avoid accidental destruction.",
             "Type": "String",
-            "MinLength": "2",            
+            "MinLength": "2",
             "Default": "mc-maps"
         },
         "MCSNSEmailAddress": {
@@ -84,14 +84,16 @@
     },
     "Conditions": {
         "CreateRenderJobRessourcesCondition": {
-            "Fn::Not": [{
-                "Fn::Equals": [
-                    {
-                    "Ref": "MCRenderCacheBucket"
-                    },
-                    ""
-                ]
-            }]
+            "Fn::Not": [
+                {
+                    "Fn::Equals": [
+                        {
+                            "Ref": "MCRenderCacheBucket"
+                        },
+                        ""
+                    ]
+                }
+            ]
         },
         "CreateSubnetCondition": {
             "Fn::And": [
@@ -113,6 +115,17 @@
         "MCSNSTopic": {
             "Type": "AWS::SNS::Topic",
             "Properties": {
+                "TopicName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "StackAlias"
+                            },
+                            "MCSNSTopic"
+                        ]
+                    ]
+                },
                 "Subscription": [
                     {
                         "Endpoint": {
@@ -132,7 +145,32 @@
                     "Statement": [
                         {
                             "Effect": "Allow",
-                            "Action":[
+                            "Action": [
+                                "logs:CreateLogStream"
+                            ],
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "MCRunLogGroup",
+                                    "Arn"
+                                ]
+                            }
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:DescribeLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": {
+                                "Fn::GetAtt": [
+                                    "MCRunLogGroup",
+                                    "Arn"
+                                ]
+                            }
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
                                 "cloudformation:CreateStack",
                                 "cloudformation:DeleteStack",
                                 "cloudformation:DescribeStacks"
@@ -145,7 +183,7 @@
                             "Resource": [
                                 "arn:aws:iam::*:role/SSM_Controlled_Instance"
                             ]
-                        },                
+                        },
                         {
                             "Action": [
                                 "ssm:ListDocuments",
@@ -284,14 +322,14 @@
         "MCDockerRunnerUserPolicy": {
             "Type": "AWS::IAM::ManagedPolicy",
             "Properties": {
-                "Description": "Customer Managed Policy for user launchin ec2 instance.",
+                "Description": "Customer Managed Policy for user launching ec2 instance. ToDo: Delete superflous permissions.",
                 "PolicyDocument": {
                     "Version": "2012-10-17",
                     "Statement": [
                         {
                             "Effect": "Allow",
                             "Action": "iam:PassRole",
-                            "Resource": [ 
+                            "Resource": [
                                 {
                                     "Fn::Join": [
                                         "",
@@ -304,11 +342,179 @@
                                     ]
                                 }
                             ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:DescribeLogStream",
+                                "logs:GetLogEvents"
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Fn::GetAtt": [
+                                                "MCRunLogGroup",
+                                                "Arn"
+                                            ]
+                                        },
+                                        ":logstream:*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "cloudformation:CreateStack",
+                                "cloudformation:DeleteStack",
+                                "cloudformation:DescribeStacks"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": "iam:PassRole",
+                            "Resource": [
+                                "arn:aws:iam::*:role/SSM_Controlled_Instance"
+                            ]
+                        },
+                        {
+                            "Action": [
+                                "ssm:ListDocuments",
+                                "ssm:DescribeDocument",
+                                "ssm:GetDocument",
+                                "ssm:DescribeInstanceInformation",
+                                "ssm:CancelCommand",
+                                "ssm:ListCommands",
+                                "ssm:ListCommandInvocations"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        },
+                        {
+                            "Action": "ssm:SendCommand",
+                            "Effect": "Allow",
+                            "Resource": [
+                                "arn:aws:ec2:*:*:instance/*",
+                                "arn:aws:ssm:*:*:document/AWS-RunShellScript"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "route53:ListHostedZonesByName",
+                                "route53:ListHostedZones",
+                                "route53:ChangeResourceRecordSets",
+                                "route53:ListResourceRecordSets",
+                                "route53:GetChange"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "ec2:DescribeInstances",
+                                "ec2:DescribeInstanceStatus",
+                                "ec2:DescribeImages",
+                                "ec2:DescribeKeyPairs",
+                                "ec2:DescribeVpcs",
+                                "ec2:DescribeSubnets",
+                                "ec2:DescribeSecurityGroups",
+                                "ec2:DescribeVolumes",
+                                "ec2:DescribeVolumeStatus",
+                                "ec2:DescribeSnapshots",
+                                "ec2:DescribeAvailabilityZones",
+                                "ec2:TerminateInstances",
+                                "ec2:CreateTags",
+                                "ec2:CreateSnapshot",
+                                "ec2:CreateVolume",
+                                "ec2:ModifyInstanceAttribute",
+                                "ec2:DescribeSubnets",
+                                "ec2:CreateSecurityGroup",
+                                "ec2:AuthorizeSecurityGroupIngress",
+                                "ec2:DeleteSecurityGroup"
+                            ],
+                            "Resource": "*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": "ec2:RunInstances",
+                            "Resource": [
+                                "arn:aws:ec2::*:network-interface/*",
+                                "arn:aws:ec2::*:volume/*",
+                                "arn:aws:ec2::*:key-pair/*",
+                                "arn:aws:ec2::*:security-group/*",
+                                "arn:aws:ec2::*:subnet/*"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": "ec2:RunInstances",
+                            "Resource": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:ListBucket",
+                                "s3:ListBucketVersions"
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "MCMapBucket"
+                                        }
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "s3:DeleteObject",
+                                "s3:DeleteObjectTagging",
+                                "s3:DeleteObjectVersion",
+                                "s3:DeleteObjectVersionTagging",
+                                "s3:GetObject",
+                                "s3:GetObjectTagging",
+                                "s3:GetObjectVersion",
+                                "s3:GetObjectVersionTagging",
+                                "s3:PutObject",
+                                "s3:PutObjectTagging",
+                                "s3:PutObjectVersionTagging"
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "MCMapBucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "sns:Publish"
+                            ],
+                            "Resource": {
+                                "Ref": "MCSNSTopic"
+                            }
                         }
                     ]
                 }
             }
-        },            
+        },
         "MCDockerRunnerRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -347,104 +553,142 @@
                 ]
             }
         },
+        "MCRunLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": 30,
+                "LogGroupName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "MCStack-",
+                            {
+                                "Ref": "StackAlias"
+                            },
+                            "-RunLogGroup"
+                        ]
+                    ]
+                }
+            }
+        },
         "MCRenderSubnet1": {
             "Type": "AWS::EC2::Subnet",
             "Condition": "CreateSubnetCondition",
             "Properties": {
-              "CidrBlock": {
-                  "Ref": "MCSubnetIDv4Cidr"
-              },
-              "MapPublicIpOnLaunch": true,
-              "VpcId" : {
-                  "Ref": "ExistingVpcId"
-              }
+                "CidrBlock": {
+                    "Ref": "MCSubnetIDv4Cidr"
+                },
+                "MapPublicIpOnLaunch": true,
+                "VpcId": {
+                    "Ref": "ExistingVpcId"
+                }
             }
-          },
+        },
+        "MCRenderLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Condition": "CreateRenderJobRessourcesCondition",
+            "Properties": {
+                "RetentionInDays": 30,
+                "LogGroupName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "MCStack-",
+                            {
+                                "Ref": "StackAlias"
+                            },
+                            "-RenderLogGroup"
+                        ]
+                    ]
+                }
+            }
+        },
         "MCRenderJobDefinition": {
             "Type": "AWS::Batch::JobDefinition",
             "Condition": "CreateRenderJobRessourcesCondition",
             "Properties": {
-            "Type": "container",
-            "JobDefinitionName": {
-                "Fn::Join": [
-                    "",
-                    [
-                        "McOverviewerRenderMap-",
-                        {
-                            "Ref": "StackAlias"
-                        }
+                "Type": "container",
+                "JobDefinitionName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "MCStack-",
+                            {
+                                "Ref": "StackAlias"
+                            },
+                            "-McOverviewerRenderMapJobDef"
+                        ]
                     ]
-                ]
-            },
-            "ContainerProperties": {
-                "MountPoints": [],
-                "Image": {
-                    "Ref": "RenderContainerImage"
                 },
-                "Command": [
-                "render_map.sh",
-                "name_of_map"
-                ],
-                "Environment": [
-                    {
-                        "Name": "bucket",
-                        "Value": {
-                            "Ref":"MCMapBucket"
-                        }
+                "ContainerProperties": {
+                    "MountPoints": [],
+                    "Image": {
+                        "Ref": "RenderContainerImage"
                     },
-                    {
-                        "Name": "bucket_map_dir",
-                        "Value": {
-                            "Ref": "MCMapBucketDir"
+                    "Command": [
+                        "render_map.sh",
+                        "name_of_map"
+                    ],
+                    "Environment": [
+                        {
+                            "Name": "bucket",
+                            "Value": {
+                                "Ref": "MCMapBucket"
+                            }
+                        },
+                        {
+                            "Name": "bucket_map_dir",
+                            "Value": {
+                                "Ref": "MCMapBucketDir"
+                            }
+                        },
+                        {
+                            "Name": "pub_bucket",
+                            "Value": {
+                                "Ref": "MCPubBucket"
+                            }
+                        },
+                        {
+                            "Name": "pub_bucket_maps_dir",
+                            "Value": {
+                                "Ref": "MCPubBucketDir"
+                            }
+                        },
+                        {
+                            "Name": "bucket_render_cache",
+                            "Value": {
+                                "Ref": "MCRenderCacheBucket"
+                            }
+                        },
+                        {
+                            "Name": "bucket_render_cache_dir",
+                            "Value": {
+                                "Ref": "MCRenderCacheBucketDir"
+                            }
+                        },
+                        {
+                            "Name": "google_api_key",
+                            "Value": {
+                                "Ref": "GoogleApiKey"
+                            }
+                        },
+                        {
+                            "Name": "region",
+                            "Value": {
+                                "Ref": "AWS::Region"
+                            }
                         }
+                    ],
+                    "Volumes": [],
+                    "Memory": 2000,
+                    "Privileged": false,
+                    "JobRoleArn": {
+                        "Ref": "MCRenderTaskRole"
                     },
-                    {
-                        "Name": "pub_bucket",
-                        "Value": {
-                            "Ref": "MCPubBucket"
-                        }
-                    },
-                    {
-                        "Name": "pub_bucket_maps_dir",
-                        "Value": {
-                            "Ref": "MCPubBucketDir"
-                        }
-                    },
-                    {
-                        "Name": "bucket_render_cache",
-                        "Value": {
-                            "Ref": "MCRenderCacheBucket"
-                        }
-                    },
-                    {
-                        "Name": "bucket_render_cache_dir",
-                        "Value": {
-                            "Ref": "MCRenderCacheBucketDir"
-                        }
-                    },
-                    {
-                        "Name": "google_api_key",
-                        "Value": {
-                            "Ref": "GoogleApiKey"
-                        }
-                    },
-                    {
-                        "Name": "region",
-                        "Value":  {
-                            "Ref": "AWS::Region"
-                        }
-                    }
-                ],                
-                "Volumes": [],
-                "Memory": 2000,
-                "Privileged": false,
-                "JobRoleArn": {
-                    "Ref": "MCRenderTaskRole"
-                },
-                "ReadonlyRootFilesystem": false,
-                "ResourceRequirements": [],
-                "Ulimits":[],
-                "Vcpus": 2
+                    "ReadonlyRootFilesystem": false,
+                    "ResourceRequirements": [],
+                    "Ulimits": [],
+                    "Vcpus": 2
                 }
             }
         },
@@ -453,26 +697,48 @@
             "Condition": "CreateRenderJobRessourcesCondition",
             "Properties": {
                 "GroupDescription": "No access to tcp/udp ports.",
+                "GroupName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "StackAlias"
+                            },
+                            "MCRenderCompEnvSecurityGroup"
+                        ]
+                    ]
+                },
                 "VpcId": {
                     "Ref": "ExistingVpcId"
                 }
             }
         },
         "MCRenderJobQueue": {
-            "Type" : "AWS::Batch::JobQueue",
+            "Type": "AWS::Batch::JobQueue",
             "Condition": "CreateRenderJobRessourcesCondition",
-            "Properties" : {
-                "ComputeEnvironmentOrder" : [ 
+            "Properties": {
+                "JobQueueName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "StackAlias"
+                            },
+                            "MCRenderJobQueue"
+                        ]
+                    ]
+                },
+                "ComputeEnvironmentOrder": [
                     {
                         "ComputeEnvironment": {
-                            "Ref": "MCRenderCompEnv" 
+                            "Ref": "MCRenderCompEnv"
                         },
-                    "Order": 1
+                        "Order": 1
                     }
                 ],
-                "Priority" : 10,
-                "State" : "ENABLED"
-              }
+                "Priority": 10,
+                "State": "ENABLED"
+            }
         },
         "MCRenderCompEnv": {
             "Type": "AWS::Batch::ComputeEnvironment",
@@ -480,26 +746,37 @@
             "Properties": {
                 "ServiceRole": {
                     "Ref": "MCRenderAWSBatchServiceRole"
-                    },
+                },
+                "ComputeEnvironmentName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "StackAlias"
+                            },
+                            "MCRenderCompEnv"
+                        ]
+                    ]
+                },
                 "State": "ENABLED",
                 "Type": "MANAGED",
-                "ComputeResources":
-                {
-                    "BidPercentage": 50,
+                "ComputeResources": {
+                    "BidPercentage": 95,
                     "SpotIamFleetRole": {
                         "Ref": "MCRenderEC2SpotFleetRole"
                     },
                     "MaxvCpus": 4,
                     "MinvCpus": 0,
                     "SecurityGroupIds": [
-                       {
-                          "Ref": "MCRenderCompEnvSecurityGroup"
-                       }
+                        {
+                            "Ref": "MCRenderCompEnvSecurityGroup"
+                        }
                     ],
-                    "Type": "SPOT",
+                    "Type": "EC2",
                     "Subnets": [
                         {
-                            "Fn::If": [ "CreateSubnetCondition",
+                            "Fn::If": [
+                                "CreateSubnetCondition",
                                 {
                                     "Ref": "MCRenderSubnet1"
                                 },
@@ -513,9 +790,9 @@
                         "Ref": "MCRenderEcsInstanceProfile"
                     },
                     "InstanceTypes": [
-                      "c5.large",
-                      "c4.large",
-                      "c3.large"
+                        "c5.large",
+                        "c4.large",
+                        "c3.large"
                     ]
                 }
             }
@@ -577,7 +854,7 @@
                 "Description": "Customer Managed Policy to load MC map files, render cache files and copy files to public s3 bucket.",
                 "PolicyDocument": {
                     "Version": "2012-10-17",
-                    "Statement": [ 
+                    "Statement": [
                         {
                             "Effect": "Allow",
                             "Action": [
@@ -753,7 +1030,26 @@
             }
         }
     },
-    "Outputs": {
+    "Outputs": {        
+        "MCRunLogGoupExport": {
+            "Description": "Cloudwatch log group for logging running mc instances.",
+            "Value": {
+                "Ref": "MCRunLogGroup"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "MCRunLogGroup-",
+                            {
+                                "Ref": "StackAlias"
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
         "InstanceProfileForMCDockerRunner": {
             "Description": "Instance profile for ec2 instances running MC server docker images.",
             "Value": {
@@ -835,6 +1131,6 @@
                     ]
                 }
             }
-        }        
+        }
     }
 }
