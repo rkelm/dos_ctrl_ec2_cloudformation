@@ -1,86 +1,35 @@
 ﻿# To-Do:
+- Commit, push
 
-B-FB3705
-
-add to OPTIONS in /etc/sysconfig/docker
-
-- Test sed change to /etc/sysconfig/docker !!!
-
---log-driver=awslogs --log-opt awslogs-region=eu-central-1 --log-opt awslogs-group=MCStack-TEST-RunLogGroup
-
-
-# The max number of open files for the daemon itself, and all
-# running containers.  The default value of 1048576 mirrors the value
-# used by the systemd service unit.
-DAEMON_MAXFILES=1048576
-
-# Additional startup options for the Docker daemon, for example:
-# OPTIONS="--ip-forward=true --iptables=true"
-# By default we limit the number of open files per container
-OPTIONS="--default-ulimit nofile=1024:4096 --log-driver=awslogs --log-opt awslogs-region=eu-central-1 --log-opt awslogs-group=MCStack-TEST-RunLogGroup"
-
-# How many seconds the sysvinit script waits for the pidfile to appear
-# when starting the daemon.
-DAEMON_PIDFILE_TIMEOUT=10
-
-
-dockerd \
-         --log-driver=json-file \
-         --log-opt labels=production_status \
-         --log-opt env=os,customer
-
-* Log standard & error output of run-mc-images to cloudwatch
-    - prepare-template: extend docker installation of ec2 instance
-        - installation of awslogs necessary? sudo yum install awslogs
-        	- test with docker run --log-driver=awslogs --log-opt awslogs-group=MCStack-TEST-RunLogGroup alpine echo 'This is test log event #2.'
-        - Start one log stream for each run of a docker image.
-        - LogConfiguration: # configures the logging driver
-            - Either in daemon.json or at each docker call?
-
-            LogDriver: awslogs # use logging driver awslogs to forward log messages to CloudWatch Logs 
-            Options:
-            'awslogs-region': !Ref 'AWS::Region' # the AWS region
-            'awslogs-group': # the log group to send log messages to
-                'Fn::ImportValue': !Sub '${ParentClusterStack}-LogGroup'
-            'awslogs-stream-prefix': !Ref 'AWS::StackName' # a prefix for the log stream
-
-* Put logs from srv-ctrl image into CloudWatch
+- Put logs from srv-ctrl image into CloudWatch
 	- Add some log output when starting srv_ctrl_image
-	- Use mkfifo to copy data to stdout.
+		- Log instance id when running a mc or srv_ctrl container
+		- More ec2 metadata to log?
+	- also mirror output from srv_ctrl_image client commands into cloudwatch
+		- Use mkfifo to copy data to stdout.
+
+- Commit, push
 
 * Remove log-volume.
     - Remove log tar down- and upload in srv_ctrl commands.
-    - Remove in composer.yaml -> Update overviewerconfigs and add awlogs-stream-prefix, see below. 
-    - Remove in volume command in Dockerfiles
-	- Remove bucket in configuration.
-    - Remove s2 bucket.
+    - Remove in composer.yaml 
+    - Remove in volume command in Dockerfiles 
+		- Update spigot
+			- Update docker image spigot
+			- Update docker image spigot we
+		- Commit & push
+	- Remove log_bucket_dir in configuration.
+    - Remove s3 log files and dir.
+    - Test if this requires a new client release.
 
-* Update composer.yaml in map tars
-	- Improve minenspass overviewerconfig.    "center": [0, 64, 0]
-		- crop 20000
-	- Set center for 10yearsofmc map (+2881,68,+6710)
-	- Set "tag" logdriver option when starting mc run images. Do after removing composer.yaml files from map tars.+
-	  Add Mapname?
-			--log-opt tag='{{ with split .ImageName ":" }}{{join . "_"}}{{end}}-{{.ID}}'
-
-* More Log output 
-    - also mirror output from srv_ctrl_image client commands into cloudwatch
-    - Log instance id when running a mc or srv_ctrl container
-    - More ec2 metadata to log?
-
-Reference: Installation of aws logs agent in CF template
-https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/quickref-cloudwatchlogs.html
-https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html
-https://medium.com/tensult/to-send-linux-logs-to-aws-cloudwatch-17b3ea5f4863
-
-* Improve minenspass overviewerconfig.    "center": [0, 64, 0]
-	- crop 20000
-
-* Set center for 10yearsofmc map (+2881,68,+6710)
+- Commit
 
 * Create Homepage with JS reading map_ids2.txt 
 	- Link to overviewer maps.
 	- Notice about private server.
+	- add to git
+	- create public s3 bucket via prepare-template
+		- create test-buckets to not loose prod map overviews
 
 * Why am I not receiving the server start and end mails?
 
@@ -89,11 +38,14 @@ https://medium.com/tensult/to-send-linux-logs-to-aws-cloudwatch-17b3ea5f4863
 
 * Rename git repository to something with minecraft server and ec2.
 
-* Minenspass: Buch teleport reparieren.
+* Minenspass: repair book teleport.
 
 * Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
 
-* Set awslogs-stream-prefix logdriver option when starting mc run images. Do after removing composer.yaml files from map tars.
+* Spigot Plugins Worldedit ad worldguard are loaded, but what is plugin.yml and what does this error message mean?
+ 	- In CloudWatch Logs:
+ 		[19:24:10] [Server thread/ERROR]: Could not load 'plugins/worldedit-bukkit-7.0.1-rc-1.jar' in folder 'plugins'
+		19:24:10 org.bukkit.plugin.InvalidDescriptionException: Invalid plugin.yml
 
 *** MMP Version ***
 * Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
@@ -101,7 +53,10 @@ https://medium.com/tensult/to-send-linux-logs-to-aws-cloudwatch-17b3ea5f4863
 * Add ECHO remark at the end of prepare batch that now the Minecraft runner aws iam user or its iam group 
 should be connected to the three new policies.
 - Show connection string with port number after loading a map.
-- Srv tools: add flock to protect against parallel execution
+- Srv tools: add flock to protect against parallel command execution
+- srv_ctrl_image: Wait till all commands are done before graceful shut down in run_dummy_process.sh.
+- srv_ctrl_image: Do not start any new commands, when graceful shutdown has been started.
+
 - Log to AWS CloudWatch
 	- Remove Log Mounts?
 - Setup html page for each important maps with links and information 
