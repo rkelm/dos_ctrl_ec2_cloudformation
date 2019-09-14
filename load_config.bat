@@ -54,7 +54,8 @@ IF %_FIRSTCHARS%==http: GOTO http_download
 REM Download fresh remote config file from s3.
 ECHO Downloading remote config file from s3 into cache.
 
-%AWS_BIN% s3 cp --quiet %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE% config\cached\%REMOTE_CONFIG_FILE%
+REM S3 Download ist possible via any region.
+%AWS_BIN% --region eu-central-1 s3 cp --quiet %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE% config\cached\%REMOTE_CONFIG_FILE%
 IF ERRORLEVEL 1 (
 	ECHO Could not download remote configuration file %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE%
     GOTO:eof

@@ -1,44 +1,33 @@
 ﻿# To-Do:
-- Commit, push
+  
+- remove log volume in composer.yml of other  maps 
+	- test all
 
-- Put logs from srv-ctrl image into CloudWatch
-	- Add some log output when starting srv_ctrl_image
-		- Log instance id when running a mc or srv_ctrl container
-		- More ec2 metadata to log?
-	- also mirror output from srv_ctrl_image client commands into cloudwatch
-		- Use mkfifo to copy data to stdout.
+- Commit, push all
 
-- Commit, push
+- Deploy new  client release!
+	- create & tag release
+	- Deploy & Link to remote filesystem.
+ 	- Install Client Release & Load Asterix voxelmap waypoints
+	 	- inspiron
+		- elitbk
+		- lenovo
 
-* Remove log-volume.
-    - Remove log tar down- and upload in srv_ctrl commands.
-    - Remove in composer.yaml 
-    - Remove in volume command in Dockerfiles 
-		- Update spigot
-			- Update docker image spigot
-			- Update docker image spigot we
-		- Commit & push
-	- Remove log_bucket_dir in configuration.
-    - Remove s3 log files and dir.
-    - Test if this requires a new client release.
-
-- Commit
+- Remove s3 log files and dir.
 
 * Create Homepage with JS reading map_ids2.txt 
 	- Link to overviewer maps.
 	- Notice about private server.
 	- add to git
-	- create public s3 bucket via prepare-template
-		- create test-buckets to not loose prod map overviews
 
 * Why am I not receiving the server start and end mails?
+
+* Why is listing the whitelist not working? 
 
 * Update example local config file
 * Update example remote config file
 
 * Rename git repository to something with minecraft server and ec2.
-
-* Minenspass: repair book teleport.
 
 * Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
 
@@ -46,6 +35,22 @@
  	- In CloudWatch Logs:
  		[19:24:10] [Server thread/ERROR]: Could not load 'plugins/worldedit-bukkit-7.0.1-rc-1.jar' in folder 'plugins'
 		19:24:10 org.bukkit.plugin.InvalidDescriptionException: Invalid plugin.yml
+
+* Plugin Links werden nicht gelöscht.
+
+* Add center[0,64,0] and crop(-20000,-20000,20000,20000) to overviewer default config.
+
+* GRACEFUL_TIMEOUT env var in srv_Ctrl is set to 120, in vanilla iamge it is set to 30. Why and where is it set?
+
+- create public s3 bucket in separate cf template?
+	- create test-buckets to not loose prod map overviews?
+- auto upload index.html and empty map_ids2.txt to public bucket
+
+- Show & Log timings for startup
+	- Output time at beginn of start
+	- Output time after start is finished
+	
+
 
 *** MMP Version ***
 * Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
@@ -57,8 +62,6 @@ should be connected to the three new policies.
 - srv_ctrl_image: Wait till all commands are done before graceful shut down in run_dummy_process.sh.
 - srv_ctrl_image: Do not start any new commands, when graceful shutdown has been started.
 
-- Log to AWS CloudWatch
-	- Remove Log Mounts?
 - Setup html page for each important maps with links and information 
 - Create a central map registry as a JSON file with information on running a map.
 	- information from composer.yml file
@@ -77,6 +80,7 @@ should be connected to the three new policies.
 		- vanilla
 		- spigot
 	- What more is needed?
+	- Detection of running maps: Use map-id not subdomain as tag value in srv_ctrl:run_map.sh
 - Add release number for images and tags
 	- Add MC release number to name of image: mc_vanilla_1-13-2:1.2-beta
 - Add badges to github readme.md's
@@ -129,6 +133,9 @@ should be connected to the three new policies.
 		- /index.html
 		- /map_ids.txt
 		- /robots.txt
+
+- Make docker image build scripts grab BuildTools, edti/guard.jars from personal archive directory
+  not from local directory.
 
 *** Other ***
 - Setup Murmur server or use Discord?

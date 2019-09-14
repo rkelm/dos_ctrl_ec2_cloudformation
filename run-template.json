@@ -140,15 +140,6 @@
             "Description": "Prefix to store maps in s3 bucket.",
             "Type": "String"
         },
-        "BucketLogsDir": {
-            "Description": "Prefix to store logs in s3 bucket.",
-            "Type": "String"
-        },
-        "DockerNamedVolumeLogs": {
-            "Description": "Unique name of the docker named volume used to mount the container logs directory.",
-            "Type": "String",
-            "Default": "mc-logs"
-        },
         "DockerNamedVolumeMaps": {
             "Description": "Unique name of the docker named volume used to mount the container maps directory.",
             "Type": "String",
@@ -544,10 +535,6 @@
                                             {
                                                 "Ref": "BucketMapDir"
                                             },
-                                            "\nBUCKET_LOGS_DIR=",
-                                            {
-                                                "Ref": "BucketLogsDir"
-                                            },
                                             {
                                                 "Fn::If": [
                                                     "RConPwdGiven",
@@ -568,10 +555,6 @@
                                             "\nHOST_NAMEDVOLUME_MAPS=",
                                             {
                                                 "Ref": "DockerNamedVolumeMaps"
-                                            },
-                                            "\nHOST_NAMEDVOLUME_LOGS=",
-                                            {
-                                                "Ref": "DockerNamedVolumeLogs"
                                             },
                                             "\nHOST_MCPORT=",
                                             {
@@ -697,16 +680,8 @@
                                                 "Ref": "ContainerVolumeRoot"
                                             },
                                             "/map_data",
-                                            " --mount source=",
-                                            {
-                                                "Ref": "DockerNamedVolumeLogs"
-                                            },
-                                            ",target=",
-                                            {
-                                                "Ref": "ContainerVolumeRoot"
-                                            },
-                                            "/map_logs",
-                                            " -v /var/run/docker.sock:/var/run/docker.sock ",
+                                            " -v /var/run/docker.sock:/var/run/docker.sock",                                            
+                                            " ",
                                             {
                                                 "Ref": "DockerImage"
                                             },
