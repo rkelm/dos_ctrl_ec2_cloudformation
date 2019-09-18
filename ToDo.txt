@@ -1,35 +1,16 @@
 ﻿# To-Do:
-  
-- remove log volume in composer.yml of other  maps 
-	- test all
-
-- Commit, push all
-
-- Deploy new  client release!
-	- create & tag release
-	- Deploy & Link to remote filesystem.
- 	- Install Client Release & Load Asterix voxelmap waypoints
-	 	- inspiron
-		- elitbk
-		- lenovo
-
-- Remove s3 log files and dir.
 
 * Create Homepage with JS reading map_ids2.txt 
-	- Link to overviewer maps.
-	- Notice about private server.
 	- add to git
 
 * Why am I not receiving the server start and end mails?
 
 * Why is listing the whitelist not working? 
 
+* Is remote config value "URL_MAP_ID_FILE" still needed?
+
 * Update example local config file
 * Update example remote config file
-
-* Rename git repository to something with minecraft server and ec2.
-
-* Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
 
 * Spigot Plugins Worldedit ad worldguard are loaded, but what is plugin.yml and what does this error message mean?
  	- In CloudWatch Logs:
@@ -40,7 +21,7 @@
 
 * Add center[0,64,0] and crop(-20000,-20000,20000,20000) to overviewer default config.
 
-* GRACEFUL_TIMEOUT env var in srv_Ctrl is set to 120, in vanilla iamge it is set to 30. Why and where is it set?
+* GRACEFUL_TIMEOUT env var in srv_Ctrl is set to 120, in vanilla image it is set to 30. Why and where is it set?
 
 - create public s3 bucket in separate cf template?
 	- create test-buckets to not loose prod map overviews?
@@ -50,7 +31,9 @@
 	- Output time at beginn of start
 	- Output time after start is finished
 	
+* Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
 
+* Rename git repository to something with minecraft server and ec2.
 
 *** MMP Version ***
 * Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)

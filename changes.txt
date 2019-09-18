@@ -1,3 +1,10 @@
+Added index.html example file to provide links to overviewer generated maps.
+
+v0.2
+Added logging to aws cloudwatch.
+Removed saving log files to s3.
+Fixed missing region parameter bug when downloading remote config from s3.
+
 v0.1
 Added setup_shortcuts.bat to create shortcuts for Microsoft Windows.
 Created from dos_ec2_docker_minecraft and dos_ctrl_ec2.

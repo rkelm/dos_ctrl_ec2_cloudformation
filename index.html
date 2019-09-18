@@ -1,0 +1,79 @@
+<html>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex, nofollow">
+<head>
+
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js">
+    </script>
+    <div id="app">
+        <h3>
+            This page is private. If you have not been invited to come here, then you are most
+            likely wrong here.
+        </h3>
+        <h1>Current Minecraft Worlds</h1>
+        <table>
+            <tr>
+                <th>World id</th>
+                <th>Connection address</th>
+                <th>World Map</th>
+            </tr>
+            <template v-for="world in worlds">
+                <tr>
+                    <td>{{ world.name }}</td>
+                    <td>{{ world.address }}</td>
+                    <td><a :href="world.map_url">View world map</a></td>
+                </tr>
+            </template>
+        </table>
+    </div>
+
+    <script>
+        /* Load world configuration. */
+        var xmlhttp;
+        var worlds_info_url = 'http://mc-pub.kelm.net/map_ids2.txt';
+        var default_domain = 'ps-ev.de';
+        var default_port = '36327';
+        var default_render_dir = 'map-renders';
+        var worlds_info_text;
+        var worlds_info;
+        var worlds = new Array();
+
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", worlds_info_url, false);
+            xmlhttp.send(null);
+            if (xmlhttp.readyState != 4 || xmlhttp.status != 200) {
+                throw new UserException('Error downloading ' + worlds_info_url + '.');
+            }
+            worlds_info_text = xmlhttp.responseText;
+        } else {
+            if (xmlhttp.readyState != 4 || xmlhttp.status != 200) {
+                throw new UserException('Error downloading ' + worlds_info_url + '.');
+            }
+        }
+
+        /* Parse worlds info. */
+/*        worlds_info_text = '10yearsofmc_vanilla2_1-14-4;goldencoaster_vanilla2_1-12-2;kingslanding_vanilla2_1-14-4;kl-abenteuer_vanilla2_1-14-4;minenspass_spigot-we2_1-14-4;op-world_spigot-we2_1-14-4;test_spigot2_1-13-2;test_spigot-we2_1-14-4'; */
+        worlds_info = worlds_info_text.split(';');
+        for (i in worlds_info) {
+            var obj = {
+                name: worlds_info[i],
+                address: worlds_info[i].split(';')[0] + '.' + default_domain + ':' + default_port,
+                map_url: '/' + default_render_dir + '/' + worlds_info[i] + '/index.html'
+            }
+
+            worlds.push(obj)
+        }
+
+        new Vue({
+            el: "#app",
+            data: {
+                worlds: worlds
+            }
+        });
+    </script>
+</body>
+
+</html>
