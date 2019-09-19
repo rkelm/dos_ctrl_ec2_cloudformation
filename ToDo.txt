@@ -1,16 +1,6 @@
 ﻿# To-Do:
 
-* Create Homepage with JS reading map_ids2.txt 
-	- add to git
-
-* Why am I not receiving the server start and end mails?
-
 * Why is listing the whitelist not working? 
-
-* Is remote config value "URL_MAP_ID_FILE" still needed?
-
-* Update example local config file
-* Update example remote config file
 
 * Spigot Plugins Worldedit ad worldguard are loaded, but what is plugin.yml and what does this error message mean?
  	- In CloudWatch Logs:
@@ -19,21 +9,38 @@
 
 * Plugin Links werden nicht gelöscht.
 
-* Add center[0,64,0] and crop(-20000,-20000,20000,20000) to overviewer default config.
-
+* Is remote config value "URL_MAP_ID_FILE" still needed?
 * GRACEFUL_TIMEOUT env var in srv_Ctrl is set to 120, in vanilla image it is set to 30. Why and where is it set?
+
+* Add center[0,64,0] and crop(-20000,-20000,20000,20000) to overviewer default config.
+* Does policy MCStackMCD1-Prepared-MCRenderTaskPolicy- need to be asssigned to MCRunner group?
 
 - create public s3 bucket in separate cf template?
 	- create test-buckets to not loose prod map overviews?
-- auto upload index.html and empty map_ids2.txt to public bucket
+- auto upload index.html and empty map_ids2.txt to public bucket?
 
-- Show & Log timings for startup
+* Show & WatchLog timings for startup
 	- Output time at beginn of start
 	- Output time after start is finished
+	- For loading maps
+	- for starting instance
 	
+* Are instances tagged correctly for discovery by other clients?
+
+* Remove superflous comments
+	- in cf_bootstrap.bat
+	- other batch files
+
+* Auto create changes.txt from git comments.
+	- Create release.sh script?
+
 * Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
 
+* Update example local config file
+* Update example remote config file
+
 * Rename git repository to something with minecraft server and ec2.
+
 
 *** MMP Version ***
 * Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
@@ -64,11 +71,17 @@ should be connected to the three new policies.
 		- spigot
 	- What more is needed?
 	- Detection of running maps: Use map-id not subdomain as tag value in srv_ctrl:run_map.sh
+
 - Add release number for images and tags
 	- Add MC release number to name of image: mc_vanilla_1-13-2:1.2-beta
+	- Or use combined tag? i.e. mc_vanilla:1.13.2_1.2-beta
+		- Advantages: No need to create new repos, with new versions.
+
 - Add badges to github readme.md's
+
 - Check and complete readme.md's
 
+- Create docker image for Paper Server to replace spigot.
 
 *** Luxury Features ***
 - Make DNSHOSTNAME optional in run_Template.json
@@ -127,6 +140,11 @@ https://octo.sh/container-library/murmur-docker
 https://github.com/mattikus/docker-murmur
 
 - Setup ECR
+
+- Automate SNS notifaction at cf events via lambda filter
+i.e.
+https://aws.amazon.com/de/premiumsupport/knowledge-center/cloudformation-rollback-email/
+https://github.com/claudiobizzotto/aws-cloudformation-notifications
 
 - Add CraftBook Mod to server images
 

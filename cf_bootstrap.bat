@@ -152,9 +152,17 @@ REM ECHO AWS EC2 Instanz startet. (Instance ID %INSTANCEID%)
 ECHO %DATE% %TIME% AWS CloudFormation Stack %STACKNAME%-Run Instanz startet. >> dos_ctrl_ec2.log
 
 REM Send notice about starting instance.
-REM IF NOT [%SNS_TOPIC_ARN%] == [] (
-REM 	%AWS_BIN% sns publish --topic-arn "%SNS_TOPIC_ARN%" --subject "STARTE %APP_NAME% Server auf ec2 Instanztyp %INSTANCETYPE%" --message "Starte %APP_NAME% Server auf %INSTANCETYPE% in Stack %STACKNAME%-Run. (%DATE% %TIME%)" --output text > messageid.txt
-REM )REM 
+IF NOT [%ADMIN_EMAIL%] == [] (
+  %AWS_BIN% --region %REGION% cloudformation describe-stacks ^
+      --stack-name %STACKNAME%-Prepared ^
+      --query "Stacks[0].Outputs[?contains(OutputKey,'SNSTopicArn')].OutputValue" ^
+      --output text > sns-arn.txt
+  SET /P _SNS_TOPIC_ARN=<sns-arn.txt
+ 	%AWS_BIN% --region %REGION% sns publish --topic-arn "!_SNS_TOPIC_ARN!" ^
+      --subject "STARTE %APP_NAME% Server auf ec2 Instanztyp %INSTANCETYPE%" ^
+      --message "Starte %APP_NAME% Server auf %INSTANCETYPE% in Stack %STACKNAME%-Run. (%DATE% %TIME%)" ^
+      --output text > messageid.txt
+)
 
 REM Tag Instance for easy identification by 
 REM other clients without knowledge of instance id.

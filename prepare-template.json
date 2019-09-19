@@ -17,7 +17,7 @@
             "MinLength": "5"
         },
         "StackAlias": {
-            "Description": "Suffix for names of outputs and unique names created in this template.",
+            "Description": "Used for unique names and as suffix for names of outputs created in this template.",
             "Type": "String",
             "MinLength": "1"
         },
@@ -119,10 +119,11 @@
                     "Fn::Join": [
                         "",
                         [
+                            "MCStack-",                            
                             {
                                 "Ref": "StackAlias"
                             },
-                            "MCSNSTopic"
+                            "-MCSNSTopic"
                         ]
                     ]
                 },
@@ -701,6 +702,7 @@
                     "Fn::Join": [
                         "",
                         [
+                            "MCStack-",
                             {
                                 "Ref": "StackAlias"
                             },
@@ -721,6 +723,7 @@
                     "Fn::Join": [
                         "",
                         [
+                            "MCStack-",
                             {
                                 "Ref": "StackAlias"
                             },
@@ -751,6 +754,7 @@
                     "Fn::Join": [
                         "",
                         [
+                            "MCStack-",
                             {
                                 "Ref": "StackAlias"
                             },
@@ -1092,6 +1096,19 @@
             "Description": "ARN of SNS Topic for MC server status notifications.",
             "Value": {
                 "Ref": "MCSNSTopic"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "MCSNSTopic-",
+                            {
+                                "Ref": "StackAlias"
+                            }
+                        ]
+                    ]
+                }
             }
         },
         "JobDefinitionForMCRender": {

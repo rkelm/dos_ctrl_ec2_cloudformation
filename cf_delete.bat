@@ -42,6 +42,18 @@ IF DEFINED _STACKID (
     ECHO Failed. Run stack may still exist.
 ) ELSE (
     ECHO Success. Run stack has been deleted.
+    REM Send notice about starting instance.
+    IF NOT [%ADMIN_EMAIL%] == [] (
+      %AWS_BIN% --region %REGION% cloudformation describe-stacks ^
+          --stack-name %STACKNAME%-Prepared ^
+          --query "Stacks[0].Outputs[?contains(OutputKey,'SNSTopicArn')].OutputValue" ^
+          --output text > sns-arn.txt
+      SET /P _SNS_TOPIC_ARN=<sns-arn.txt
+	    %AWS_BIN% --region %REGION% sns publish --topic-arn "!_SNS_TOPIC_ARN!" ^
+        --subject "BEENDE %APP_NAME% Server mit Instanz ID %INSTANCEID%" ^
+        --message "Beende %APP_NAME% Server mit Instanz ID %INSTANCEID%. (%DATE% %TIME%)" ^
+        --output text > messageid.txt
+    )
 )
 
 
