@@ -20,7 +20,8 @@ REM Load config.
 CALL load_config.bat %_CONFIG%
 IF ERRORLEVEL 2 EXIT /B 1
 
-REM Insert stop/save MC Server here
+ECHO Stopping and saving current map.
+CALL cf_send_cmd.bat %_CONFIG% stop_map.sh
 
 REM Delete "run" CloudFormation Stack
 ECHO Deleting running stack %STACKNAME%-Run...

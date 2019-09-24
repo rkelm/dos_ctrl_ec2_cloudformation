@@ -1,43 +1,49 @@
 ﻿# To-Do:
 
-* Why is listing the whitelist not working? 
-
-* Spigot Plugins Worldedit ad worldguard are loaded, but what is plugin.yml and what does this error message mean?
- 	- In CloudWatch Logs:
- 		[19:24:10] [Server thread/ERROR]: Could not load 'plugins/worldedit-bukkit-7.0.1-rc-1.jar' in folder 'plugins'
-		19:24:10 org.bukkit.plugin.InvalidDescriptionException: Invalid plugin.yml
-
-* Plugin Links werden nicht gelöscht.
-
-* Is remote config value "URL_MAP_ID_FILE" still needed?
-* GRACEFUL_TIMEOUT env var in srv_Ctrl is set to 120, in vanilla image it is set to 30. Why and where is it set?
-
 * Add center[0,64,0] and crop(-20000,-20000,20000,20000) to overviewer default config.
-* Does policy MCStackMCD1-Prepared-MCRenderTaskPolicy- need to be asssigned to MCRunner group?
+	- test
 
-- create public s3 bucket in separate cf template?
-	- create test-buckets to not loose prod map overviews?
-- auto upload index.html and empty map_ids2.txt to public bucket?
+* Create temp directory for storing temp files (i.e. instancid.txt)
+	- check existence/create when loading config?
+	- all files created must be in temp directory
+	- test 
+
+* Remove superflous comments
+	- in cf_bootstrap.bat
+	- other batch files
+
+* Update example local config file
+* Update example remote config file
 
 * Show & WatchLog timings for startup
 	- Output time at beginn of start
 	- Output time after start is finished
 	- For loading maps
 	- for starting instance
-	
-* Are instances tagged correctly for discovery by other clients?
+	- Log from client to cloudwatch & remove superflous messages to console.
+		- cf_bootstrap.bat
+		- cf_delete.bat
 
-* Remove superflous comments
-	- in cf_bootstrap.bat
-	- other batch files
+* create public s3 bucket in separate cf template?
+	- create test-buckets to not loose prod map overviews?
+* auto upload index.html and empty map_ids2.txt to public bucket in prepare.cf or cf template?
 
 * Auto create changes.txt from git comments.
+	- In build script?
 	- Create release.sh script?
+	- Use make?
 
 * Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
 
-* Update example local config file
-* Update example remote config file
+* Release client tools
+	- update srv_ctrl image tag in MCCD1
+	- update shared installations of clients
+	- Update MCD1 config to most current version tag for srv_ctrl_image.
+
+* Add srv_ctrl image source to dos_ctrl_ec2_cloudformation?
+	- Not good because its developed on different systems (linux vs. windows)
+	  there will always be different working directories.
+	  Or can this be changed? Mount path to vagrant instance?
 
 * Rename git repository to something with minecraft server and ec2.
 
@@ -52,7 +58,7 @@ should be connected to the three new policies.
 - srv_ctrl_image: Wait till all commands are done before graceful shut down in run_dummy_process.sh.
 - srv_ctrl_image: Do not start any new commands, when graceful shutdown has been started.
 
-- Setup html page for each important maps with links and information 
+* Setup html page for each important maps with links and information 
 - Create a central map registry as a JSON file with information on running a map.
 	- information from composer.yml file
 	- name of map
@@ -83,6 +89,7 @@ should be connected to the three new policies.
 
 - Create docker image for Paper Server to replace spigot.
 
+
 *** Luxury Features ***
 - Make DNSHOSTNAME optional in run_Template.json
 - DockerRunnerPolicy: Supply route53 Resource as parameter (arn:aws:route53:::hostedzone/hosted zone ID)
@@ -109,6 +116,11 @@ should be connected to the three new policies.
 
 - setup resource based policy 
 
+* How to make creating docker images with certain mods easier?
+	- user paper server
+	- Which mods would be good?
+
+
 *** Configuration management ***
 - What to do with remaining parameters?
 	- Create Batch file to create new configs with compatible software version numbers?
@@ -132,6 +144,7 @@ should be connected to the three new policies.
 
 - Make docker image build scripts grab BuildTools, edti/guard.jars from personal archive directory
   not from local directory.
+
 
 *** Other ***
 - Setup Murmur server or use Discord?
@@ -164,6 +177,7 @@ C:\Users\Rober\work\aws_mc_srv\dos_ctrl_ec2_cloudformation>cf_send_cmd.bat TEST 
 Results in => 'charmap' codec can't encode character u'\ufffd' in position 0: character maps to <undefined>
 
 * Autosave map to s3 in map dependent intervalls
+* Send SNS notification "Server still running" in configurable intervalls (srv_ctrl env var from config file).
 
 * Render_map.sh: Make number of lower tile layers to delete a parameter, currently the 2 layers are deleted.
 
