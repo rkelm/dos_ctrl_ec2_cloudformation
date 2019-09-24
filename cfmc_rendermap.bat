@@ -120,24 +120,27 @@ REM Get name of render job queue.
 SET /P _BATCH_RENDER_JOB_QUEUE=<renderjobqueue.txt
 
 REM *** Create AWS Batch Job.
-aws batch submit-job --job-name %_BATCH_RENDER_JOB_NAME% ^
+aws batch submit-job --region %REGION% ^
+					 --job-name %_BATCH_RENDER_JOB_NAME% ^
                      --job-queue %_BATCH_RENDER_JOB_QUEUE% ^
                      --job-definition %_BATCH_RENDER_JOB_DEFINITION%  ^
 					 --container-overrides "command=render_map.sh,%_map_id%" ^
 					 --query "jobId" --output text > job_id.txt
-
 REM --parameters KeyName1=string,KeyName2=string
-
-SET /P _JOBID=<job_id.txt
 
 REM *** Show success or failure message.
 IF NOT ERRORLEVEL 1 (
 	ECHO Batch Job %_BATCH_RENDER_JOB_NAME% mit JobId %_JOBID% erstellt.
 ) ELSE (
 	ECHO Batch Job Erstellung fehlgeschlagen.
+	GOTO END
 )
+
+SET /P _JOBID=<job_id.txt
+
 
 ECHO Aktualisierung der Karte %_map_id% gestartet. Das kann bis zu 30 Minuten dauern.
 ECHO Das Ergebnis kann spaeter unter %URL_MAP_OVERVIEW% eingesehen werden.
 
+:END
 PAUSE
