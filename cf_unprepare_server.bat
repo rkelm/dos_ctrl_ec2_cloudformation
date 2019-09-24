@@ -41,8 +41,8 @@ ECHO Waiting for end of stack delete...
 
 REM Check for error.
 ECHO Verifying success...
-%AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Prepared --query Stacks[0].StackId --output text > prepared-stack.txt 2> nul
-SET /P _STACKID=<prepared-stack.txt
+%AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Prepared --query Stacks[0].StackId --output text > %TEMPDIR%prepared-stack.txt 2> nul
+SET /P _STACKID=<%TEMPDIR%prepared-stack.txt
 IF DEFINED _STACKID (
     ECHO Failed. Prepared stack still exists.
 ) ELSE (

@@ -47,7 +47,7 @@ REM Check for running instance by searching for tag in aws cloud.
 %AWS_BIN% --region %REGION%  %ec2 describe-instances ^
   --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% ^
   --output=text ^
-  --query Reservations[*].Instances[*].InstanceId > %_INSTIDFILE%
+  --query Reservations[*].Instances[*].InstanceId > %TEMPDIR%%_INSTIDFILE%
 REM Delete instance id file if it is empty.
 for %%F in ("%_INSTIDFILE%") do if %%~zF equ 0 del "%%F"
 IF NOT EXIST %_INSTIDFILE% (
@@ -56,26 +56,26 @@ IF NOT EXIST %_INSTIDFILE% (
   ECHO Bitte erst eine Instanz starten.
   EXIT /b 1
 )
-SET /P _INSTANCEID=<%_INSTIDFILE%
+SET /P _INSTANCEID=<%TEMPDIR%%_INSTIDFILE%
 
 REM Send command.
-REM %AWS_BIN% --region %REGION% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > commandid.txt
+REM %AWS_BIN% --region %REGION% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > %TEMPDIR%commandid.txt
 
 %AWS_BIN% --region %REGION% ssm send-command --instance-ids %_INSTANCEID% ^
   --document-name "AWS-RunShellScript" ^
   --parameters "{\"commands\":[\"%_SERVER_COMMAND%\"]}" ^
-  --query Command.CommandId > commandid.txt
+  --query Command.CommandId > %TEMPDIR%commandid.txt
 
-SET /P COMMANDID=<commandid.txt
+SET /P COMMANDID=<%TEMPDIR%commandid.txt
 
 REM Wait till command execution terminates.
 :CMD_EXECUTION
 %AWS_BIN% --region %REGION% ssm list-command-invocations --command-id "%COMMANDID%" ^
   --detail --query CommandInvocations[*].Status ^
-  --output text > cmd_status.txt
-SET /P status=<cmd_status.txt
+  --output text > %TEMPDIR%cmd_status.txt
+SET /P status=<%TEMPDIR%cmd_status.txt
 IF [%STATUS%]==[InProgress] (
-	TIMEOUT /T 1 /NOBREAK > nul
+	TIMEOUT /T 1 /NOBREAK > %TEMPDIR%nul
 	GOTO CMD_EXECUTION
 )
 

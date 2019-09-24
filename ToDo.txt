@@ -1,19 +1,9 @@
 ﻿# To-Do:
 
-* Add center[0,64,0] and crop(-20000,-20000,20000,20000) to overviewer default config.
-	- test
+* Show connection string with port number after loading a map.
 
-* Create temp directory for storing temp files (i.e. instancid.txt)
-	- check existence/create when loading config?
-	- all files created must be in temp directory
-	- test 
-
-* Remove superflous comments
-	- in cf_bootstrap.bat
-	- other batch files
-
-* Update example local config file
-* Update example remote config file
+* Add ECHO remark at the end of prepare batch that now the Minecraft runner aws iam user or its iam group 
+should be connected to the three new policies.
 
 * Show & WatchLog timings for startup
 	- Output time at beginn of start
@@ -24,9 +14,12 @@
 		- cf_bootstrap.bat
 		- cf_delete.bat
 
-* create public s3 bucket in separate cf template?
-	- create test-buckets to not loose prod map overviews?
-* auto upload index.html and empty map_ids2.txt to public bucket in prepare.cf or cf template?
+* Remove superflous comments
+	- in cf_bootstrap.bat
+	- other batch files
+
+* Update example local config file
+* Update example remote config file
 
 * Auto create changes.txt from git comments.
 	- In build script?
@@ -51,19 +44,25 @@
 *** MMP Version ***
 * Put schematics folder to s3 bucket. (Create s3 bucket in cloudformation template.)
 
-* Add ECHO remark at the end of prepare batch that now the Minecraft runner aws iam user or its iam group 
-should be connected to the three new policies.
-- Show connection string with port number after loading a map.
-- Srv tools: add flock to protect against parallel command execution
-- srv_ctrl_image: Wait till all commands are done before graceful shut down in run_dummy_process.sh.
-- srv_ctrl_image: Do not start any new commands, when graceful shutdown has been started.
+* create public s3 bucket in separate cf template?
+	- create test-buckets to not loose prod map overviews?
+* auto upload index.html and empty map_ids2.txt to public bucket in prepare.cf or cf template?
+
+* srv_ctrl_image: add flock to protect against parallel command execution
+	- srv_ctrl_image: Wait till all commands are done before graceful shut down in run_dummy_process.sh.
+	- srv_ctrl_image: Do not start any new commands, when graceful shutdown has been started.
 
 * Setup html page for each important maps with links and information 
-- Create a central map registry as a JSON file with information on running a map.
+
+* For each map create a JSON file with information about the map.
 	- information from composer.yml file
+		- remove composer.yml files
+		- can app_cmd.sh also be removed?
+				- communication using rcon or console?
 	- name of map
 	- subdomain
-- Add tools to add, remove, change worlds (in python!)
+
+* Add tools to add, remove, change worlds (in python!)
 	- update map_ids.txt from s3 inventory?
 	- remove map from s3
 	- copy map to new name

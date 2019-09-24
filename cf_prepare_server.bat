@@ -34,8 +34,8 @@ REM %AWS_BIN% --region %REGION% s3 cp prepare-template.json s3://%MAP_BUCKET%/pr
 REM %AWS_BIN% --region %REGION% s3 cp run-template.json s3://%MAP_BUCKET%/run-template.json
 
 REM Get default vpc and default subnet.
-%AWS_BIN% --region %REGION%  ec2 describe-vpcs --filters Name=isDefault,Values=true --query Vpcs[0].VpcId --output text > defaultvpc.txt
-SET /P _DEFAULTVPC=<defaultvpc.txt
+%AWS_BIN% --region %REGION%  ec2 describe-vpcs --filters Name=isDefault,Values=true --query Vpcs[0].VpcId --output text > %TEMPDIR%defaultvpc.txt
+SET /P _DEFAULTVPC=<%TEMPDIR%defaultvpc.txt
 IF NOT DEFINED _DEFAULTVPC (
   ECHO No defaut vpc found. Please create a default vpc. Exiting.
   EXIT /B 1
@@ -70,8 +70,8 @@ ECHO Waiting for end of stack creation...
 
 REM Check for error.
 ECHO Verifying success...
-%AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Prepared --query Stacks[0].StackId --output text > prepared-stack.txt
-SET /P _STACKID=<prepared-stack.txt
+%AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Prepared --query Stacks[0].StackId --output text > %TEMPDIR%prepared-stack.txt
+SET /P _STACKID=<%TEMPDIR%prepared-stack.txt
 IF DEFINED _STACKID (
     ECHO Success. Prepared stack created.
 ) ELSE (

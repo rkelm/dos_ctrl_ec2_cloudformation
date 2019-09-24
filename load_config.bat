@@ -7,11 +7,12 @@ IF NOT DEFINED _CONFIG (
   EXIT /B 1
 )
 
-REM Remember previous current directory.
-SET CONFIGDIR=%~dp0config\
 
 REM Load local config.
+SET CONFIGDIR=%~dp0config\
 SET _CONFIGFILE=%CONFIGDIR%%_CONFIG%_config_local.bat
+
+SET TEMPDIR=%~dp0temp\
 
 REM ECHO %_CONFIGFILE%
 REM Check if local config file exists. If not complain.
@@ -100,3 +101,8 @@ CALL %REMOTE_CONFIG_PATH%%REMOTE_CONFIG_FILE%
 
 :end
 IF ERRORLEVEL 2 EXIT /B 2
+
+REM Create directory for storing temporary files if it does not exist.
+IF NOT EXIST %TEMPDIR% (
+	MKDIR %TEMPDIR%
+)

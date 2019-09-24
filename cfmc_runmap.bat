@@ -34,14 +34,14 @@ IF NOT DEFINED URL_MAP_ID_FILE (
 	EXIT /b 1
 )
 
-%CURL_BIN% %CURL_OPTIONS% -s %URL_MAP_ID_FILE%  > map_ids.txt
+%CURL_BIN% %CURL_OPTIONS% -s %URL_MAP_ID_FILE%  > %TEMPDIR%map_ids.txt
 IF ERRORLEVEL 1 (
   ECHO Konnte die Map-Liste nicht von %URL_MAP_ID_FILE% laden.
   PAUSE
   EXIT /B 1
 )
 
-SET /P list=<map_ids.txt
+SET /P list=<%TEMPDIR%map_ids.txt
 
 :SHOWMENU
 ECHO.

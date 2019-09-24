@@ -29,13 +29,13 @@ REM Check: "Is the last from this client startet instance still running?"
 IF EXIST %INSTIDFILE% (
 	REM Load old instance id from file.
 	SET INSTANCEID=EMPTY
-	SET /P INSTANCEID=<%INSTIDFILE%
+	SET /P INSTANCEID=<%TEMPDIR%%INSTIDFILE%
 
 	IF NOT [!INSTANCEID!] == [EMPTY] (
 		REM Ask aws if this is a known running/pending/shutting-down instance.
-		%AWS_BIN% --region %REGION% ec2 describe-instances --filters Name=instance-state-name,Values=running,shutting-down,pending Name=instance-id,Values=!INSTANCEID! --output=text --query Reservations[*].Instances[*].InstanceId > output.txt
+		%AWS_BIN% --region %REGION% ec2 describe-instances --filters Name=instance-state-name,Values=running,shutting-down,pending Name=instance-id,Values=!INSTANCEID! --output=text --query Reservations[*].Instances[*].InstanceId > %TEMPDIR%output.txt
 		SET OUTPUT=EMPTY
-		SET /P OUTPUT=<output.txt
+		SET /P OUTPUT=<%TEMPDIR%output.txt
 		IF NOT [!OUTPUT!] == [EMPTY] (
 			REM Instance ist still running. Complain to user and exit.
 			ECHO Es laeuft bereits eine Instanz von %APP_NAME% !
@@ -47,7 +47,7 @@ IF EXIST %INSTIDFILE% (
 )
 
 REM Check for running instance by searching for tag in aws cloud.
-%AWS_BIN% --region %REGION% ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% --output=text --query Reservations[*].Instances[*].InstanceId > %INSTIDFILE%
+%AWS_BIN% --region %REGION% ec2 describe-instances --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% --output=text --query Reservations[*].Instances[*].InstanceId > %TEMPDIR%%INSTIDFILE%
 REM Delete instance id file if it is empty.
 for %%F in ("%INSTIDFILE%") do if %%~zF equ 0 del "%%F"
 IF EXIST %INSTIDFILE% (
@@ -73,9 +73,9 @@ IF [%IMAGEID%] == [CURRENT] (
 	  --filters Name=root-device-type,Values=ebs Name=architecture,Values=x86_64 Name=virtualization-type,Values=hvm Name=name,Values=amzn-ami-hvm-2*gp2 Name=state,Values=available ^
 	  --owners amazon ^
 	  --query "Images[?^!contains(Name, '.rc-')]|sort_by(@, &CreationDate)[-1].[ImageId]" ^
-	  --output text > ami_image_id.txt
+	  --output text > %TEMPDIR%ami_image_id.txt
 
-	SET /P IMAGEID=<ami_image_id.txt
+	SET /P IMAGEID=<%TEMPDIR%ami_image_id.txt
 )
 
 IF NOT [%IMAGEID%] == [] (
@@ -128,8 +128,8 @@ ECHO Waiting for end of stack creation...
 REM Check for error.
 ECHO Verifying success...
 %AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Run ^
-  --query Stacks[0].StackId --output text > run-stack.txt
-SET /P _STACKID=<run-stack.txt
+  --query Stacks[0].StackId --output text > %TEMPDIR%run-stack.txt
+SET /P _STACKID=<%TEMPDIR%run-stack.txt
 IF DEFINED _STACKID (
     ECHO Success. Run stack created.
 ) ELSE (
@@ -138,9 +138,9 @@ IF DEFINED _STACKID (
 )
 
 REM EC2 Instanztyp %INSTANCETYPE% 
-REM %AWS_BIN% ec2 run-instances --image-id %IMAGEID% --instance-type %INSTANCETYPE% %KEYPAIR_PARAM% %SECURITYGROUPSID_PARAM% --instance-initiated-shutdown-behavior terminate --region %REGION% %SUBNETID_PARAM% %SSM_ROLE_NAME_PARAM% --user-data file://prepare_server.sh --output text --query Instances[*].InstanceId > %INSTIDFILE%
+REM %AWS_BIN% ec2 run-instances --image-id %IMAGEID% --instance-type %INSTANCETYPE% %KEYPAIR_PARAM% %SECURITYGROUPSID_PARAM% --instance-initiated-shutdown-behavior terminate --region %REGION% %SUBNETID_PARAM% %SSM_ROLE_NAME_PARAM% --user-data file://prepare_server.sh --output text --query Instances[*].InstanceId > %TEMPDIR%%INSTIDFILE%
 REM SET INSTANCEID=EMPTY
-REM SET /P INSTANCEID=<%INSTIDFILE%
+REM SET /P INSTANCEID=<%TEMPDIR%%INSTIDFILE%
 
 REM IF [%INSTANCEID%] == [EMPTY] (
 REM 	DEL %INSTIDFILE%
@@ -156,12 +156,12 @@ IF NOT [%ADMIN_EMAIL%] == [] (
   %AWS_BIN% --region %REGION% cloudformation describe-stacks ^
       --stack-name %STACKNAME%-Prepared ^
       --query "Stacks[0].Outputs[?contains(OutputKey,'SNSTopicArn')].OutputValue" ^
-      --output text > sns-arn.txt
-  SET /P _SNS_TOPIC_ARN=<sns-arn.txt
+      --output text > %TEMPDIR%sns-arn.txt
+  SET /P _SNS_TOPIC_ARN=<%TEMPDIR%sns-arn.txt
  	%AWS_BIN% --region %REGION% sns publish --topic-arn "!_SNS_TOPIC_ARN!" ^
       --subject "STARTE %APP_NAME% Server auf ec2 Instanztyp %INSTANCETYPE%" ^
       --message "Starte %APP_NAME% Server auf %INSTANCETYPE% in Stack %STACKNAME%-Run. (%DATE% %TIME%)" ^
-      --output text > messageid.txt
+      --output text > %TEMPDIR%messageid.txt
 )
 
 REM Tag Instance for easy identification by 
@@ -174,7 +174,7 @@ REM 	SET _VOLUMEID=%VOLUMEID%
 REM ) ELSE (
 REM 	IF DEFINED VOLUMETAGKEY (
 REM 		REM Find ebs volume by tag. 
-REM 		%AWS_BIN% ec2 describe-volumes --region %REGION% --filters Name=status,Values=available Name=tag:%VOLUMETAGKEY%,Values=%VOLUMETAGVALUE% --output=text --query Volumes[*].VolumeId > volumeid.txt
+REM 		%AWS_BIN% ec2 describe-volumes --region %REGION% --filters Name=status,Values=available Name=tag:%VOLUMETAGKEY%,Values=%VOLUMETAGVALUE% --output=text --query Volumes[*].VolumeId > %TEMPDIR%volumeid.txt
         REM Delete volumeid file if it is empty.
 REM 		for %%F in ("volumeid.txt") do if %%~zF equ 0 del "%%F"
 REM 		IF NOT EXIST volumeid.txt (
@@ -182,14 +182,14 @@ REM 			ECHO Kein verfuegbares EBS Volume mit Tag-Name/Value: %VOLUMETAGKEY% / %V
 REM 			ECHO Der Start einer neuen Instanz wird abgebrochen.
 REM 			EXIT /b 1
 REM 		)
-REM 		SET /P _VOLUMEID=<volumeid.txt
+REM 		SET /P _VOLUMEID=<%TEMPDIR%volumeid.txt
 REM 	) ELSE  (
 	    REM Get snapshot id to create Volume from snapshot.
 REM 		IF DEFINED SNAPSHOTID (
 REM 			SET _SNAPSHOT=%SNAPSHOTID%
 REM 		) ELSE (
 REM 			REM Find snapshot by tag.
-REM 			%AWS_BIN% ec2 describe-snapshots --region %REGION% --filters Name=status,Values=completed Name=tag:%SNAPSHOTTAGKEY%,Values=%SNAPSHOTTAGVALUE% --output=text --query Snapshots[*].SnapshotId > snapshotid.txt
+REM 			%AWS_BIN% ec2 describe-snapshots --region %REGION% --filters Name=status,Values=completed Name=tag:%SNAPSHOTTAGKEY%,Values=%SNAPSHOTTAGVALUE% --output=text --query Snapshots[*].SnapshotId > %TEMPDIR%%TEMPDIR%snapshotid.txt
 REM 			REM Delete snapshotid file if it is empty.
 REM 			for %%F in ("snapshotid.txt") do if %%~zF equ 0 del "%%F"
 REM 			IF NOT EXIST snapshotid.txt (
@@ -197,15 +197,15 @@ REM 				ECHO Kein EBS Snapshot mit Tag-Name/Value: %SNAPSHOTTAGKEY% / %SNAPSHOTT
 REM 				ECHO Der Start einer neuen Instanz wird abgebrochen.
 REM 				EXIT /b 1
 REM 			)
-REM 			SET /P _SNAPSHOTID=<snapshotid.txt
+REM 			SET /P _SNAPSHOTID=<%TEMPDIR%snapshotid.txt
 REM 		)
         REM Create volume from snapshot.
 		REM Get availability zone of configured subnet.
-REM 		%AWS_BIN% ec2 describe-subnets --region %REGION% --filter Name=subnet-id,Values=%SUBNETID% --output text --query Subnets[*].AvailabilityZone > availabilityzone.txt
-REM 		SET /P _AVAILABILITYZONE=<availabilityzone.txt
+REM 		%AWS_BIN% ec2 describe-subnets --region %REGION% --filter Name=subnet-id,Values=%SUBNETID% --output text --query Subnets[*].AvailabilityZone > %TEMPDIR%availabilityzone.txt
+REM 		SET /P _AVAILABILITYZONE=<%TEMPDIR%availabilityzone.txt
 REM 		ECHO Erstelle EBS Volume in AvailabilityZone !_AVAILABILITYZONE! aus EBS Snapshot mit Id !_SNAPSHOTID!.
-REM 		%AWS_BIN% ec2 create-volume --region %REGION% --availability-zone !_AVAILABILITYZONE! --snapshot-id !_SNAPSHOTID! --volume-type gp2 --tag-specifications "ResourceType=volume,Tags=[{Key=Name,Value=TEMPORARY_%APP_NAME%}]" --query VolumeId --output text > volumeid.txt
-REM 		SET /P _VOLUMEID=<volumeid.txt
+REM 		%AWS_BIN% ec2 create-volume --region %REGION% --availability-zone !_AVAILABILITYZONE! --snapshot-id !_SNAPSHOTID! --volume-type gp2 --tag-specifications "ResourceType=volume,Tags=[{Key=Name,Value=TEMPORARY_%APP_NAME%}]" --query VolumeId --output text > %TEMPDIR%volumeid.txt
+REM 		SET /P _VOLUMEID=<%TEMPDIR%volumeid.txt
 REM 		REM Remember we created this volume.
 REM 		SET _VOLUMECREATED=TRUE
 REM 		ECHO Temporaeres Volume !_VOLUMEID! erstellt.
@@ -225,8 +225,8 @@ REM )
 
 REM Get ip address.
 REM ECHO Frage Verbindungsdaten ab.
-REM %AWS_BIN% ec2 describe-instances --instance-ids %INSTANCEID% --output text --query Reservations[*].Instances[*].PublicIpAddress > ipaddress.txt
-REM SET /P IPADDRESS=<ipaddress.txt
+REM %AWS_BIN% ec2 describe-instances --instance-ids %INSTANCEID% --output text --query Reservations[*].Instances[*].PublicIpAddress > %TEMPDIR%ipaddress.txt
+REM SET /P IPADDRESS=<%TEMPDIR%ipaddress.txt
 
 REM ECHO Die IP-Adresse der Instanz ist %IPADDRESS%
 
@@ -238,7 +238,7 @@ REM 	IF ERRORLEVEL 1 ECHO Fehler beim Aktualisieren des DNS. Siehe Logdatei dos_
 REM )
 
 REM ECHO Instanz erfolgreich gestartet, verbinde mit EBS Laufwerk.
-REM %AWS_BIN% ec2 attach-volume --volume-id %_VOLUMEID% --instance-id %INSTANCEID% --device /dev/sdf > attachvolume.json
+REM %AWS_BIN% ec2 attach-volume --volume-id %_VOLUMEID% --instance-id %INSTANCEID% --device /dev/sdf > %TEMPDIR%attachvolume.json
 
 REM IF ERRORLEVEL 1 (
 REM 	ECHO Fehler beim Verbinden der Instanz %_INSTANCEID% mit dem Laufwerk-Volume ID %_VOLUMEID%
