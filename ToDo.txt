@@ -18,15 +18,21 @@ should be connected to the three new policies.
 	- in cf_bootstrap.bat
 	- other batch files
 
-* Update example local config file
-* Update example remote config file
-
 * Auto create changes.txt from git comments.
 	- In build script?
 	- Create release.sh script?
 	- Use make?
 
+* Put build scripts in build directory.
+
+* Update example local config file
+* Update example remote config file
+
 * Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
+
+
+* create docs directory
+	- Add picture of stop workflow.
 
 * Release client tools
 	- update srv_ctrl image tag in MCCD1
