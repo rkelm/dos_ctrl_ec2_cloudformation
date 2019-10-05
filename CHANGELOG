@@ -1,3 +1,13 @@
+Changes in v0.3
+
++ Reduced messages, added filtering by loglevel for srv_ctrl image messages
++ [FEATURE] Added script to update CHANGELOG and simplify release process.
++ Temporary files are saved in "temp" subdirectory.
++ Fixed missing region parameter in cfmc_rendermap.bat
++ Added explicit call to stop mc server and save map to cf_delete.
++ Feature: Send mail at start and termination of run-stack.
++ Added index.html example file to link to overviewer generated maps.
+
 
 v0.2
 Added logging to aws cloudwatch.
