@@ -1,6 +1,8 @@
 @ECHO OFF
 REM Batch file to terminate an EC2 instance.
 
+SET _TIME_START=%TIME%
+
 REM Remember previous current directory.
 SET EXCURRENTDIR=%CD%
 
@@ -14,13 +16,15 @@ IF NOT DEFINED _CONFIG (
   EXIT /B 1
 )
 
-ECHO Stop and save running map.
+REM Stop and save running map.
 CALL cf_send_cmd.bat %_CONFIG% stop_map.sh
 
-ECHO Terminating ec2 instance.
+REM Terminating ec2 instance.
 CALL cf_delete.bat %_CONFIG%
-
-PAUSE
 
 REM Restore previous current directory.
 CD /D %EXCURRENTDIR%
+ECHO Start time %_TIME_START%
+ECHO End time   %TIME%
+
+PAUSE

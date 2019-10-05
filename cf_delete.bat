@@ -20,7 +20,7 @@ REM Load config.
 CALL load_config.bat %_CONFIG%
 IF ERRORLEVEL 2 EXIT /B 1
 
-ECHO Stopping and saving current map.
+REM Stopping and saving current map.
 CALL cf_send_cmd.bat %_CONFIG% stop_map.sh
 
 REM Delete "run" CloudFormation Stack
@@ -29,12 +29,12 @@ ECHO Deleting running stack %STACKNAME%-Run...
   --output text
 
 REM Wait until stack deletion has finished.
-ECHO Waiting for end of stack delete...
+REM Waiting for end of stack delete...
 %AWS_BIN% --region %REGION% cloudformation wait stack-delete-complete ^
   --stack-name %STACKNAME%-Run
 
 REM Check for error.
-ECHO Verifying success...
+REM Verifying success...
 %AWS_BIN% --region %REGION% cloudformation describe-stacks ^
   --stack-name %STACKNAME%-Run ^
   --query Stacks[0].StackId --output text > %TEMPDIR%prepared-stack.txt 2> nul

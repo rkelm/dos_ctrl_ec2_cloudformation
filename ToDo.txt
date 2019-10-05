@@ -1,6 +1,9 @@
 ﻿# To-Do:
 
-* Show connection string with port number after loading a map.
+* Commit & Push
+* Release and test on other clients.
+	- Is "CALL aws" in AWS_BIN config parameter necessary?
+	- This my result in another fix of the error, caused by addition of | grep -v '[DEBUG]' to send_cmd.bat
 
 * Add ECHO remark at the end of prepare batch that now the Minecraft runner aws iam user or its iam group 
 should be connected to the three new policies.
@@ -17,6 +20,10 @@ should be connected to the three new policies.
 * Remove superflous comments
 	- in cf_bootstrap.bat
 	- other batch files
+	- translate all comments to english.
+
+* Translate all messages to english.
+	- keep messages in language fileß (That's not worth the effort!)
 
 * Auto create changes.txt from git comments.
 	- In build script?

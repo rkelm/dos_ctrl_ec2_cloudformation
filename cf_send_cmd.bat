@@ -27,6 +27,25 @@ IF NOT DEFINED _APP_CMD (
 	EXIT /B 1
 )
 
+REM Check for running instance.
+SET _INSTIDFILE=%TEMPDIR%instanceid_%_CONFIG%.txt
+
+REM Check for running instance by searching for tag in aws cloud.
+%AWS_BIN% --region %REGION%  %ec2 describe-instances ^
+  --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% ^
+  --output=text ^
+  --query Reservations[*].Instances[*].InstanceId > %_INSTIDFILE%
+REM Delete instance id file if it is empty.
+for %%F in ("%_INSTIDFILE%") do if %%~zF equ 0 del "%%F"
+
+IF NOT EXIST %_INSTIDFILE% (
+  ECHO Es laeuft keine %APP_NAME% Server Instanz!
+  ECHO Kommando kann nicht ausgefuehrt werden.
+  ECHO Bitte erst eine Instanz starten.
+  EXIT /b 1
+)
+SET /P _INSTANCEID=<%_INSTIDFILE%
+
 REM Prepare server command.
 SET _I=0
 SET _SERVER_COMMAND=
@@ -38,36 +57,29 @@ FOR %%A IN ( %* ) DO (
 	)
 )
 REM Add docker exec to send command to srv_ctrl container.
-SET _SERVER_COMMAND=docker exec -t base-container %_SERVER_COMMAND%
-
-REM ECHO _SERVER_COMMAND %_SERVER_COMMAND%
-SET _INSTIDFILE=instanceid_%_CONFIG%.txt
-
-REM Check for running instance by searching for tag in aws cloud.
-%AWS_BIN% --region %REGION%  %ec2 describe-instances ^
-  --filters Name=instance-state-name,Values=running Name=tag:%TAGKEY%,Values=%TAGVALUE% ^
-  --output=text ^
-  --query Reservations[*].Instances[*].InstanceId > %TEMPDIR%%_INSTIDFILE%
-REM Delete instance id file if it is empty.
-for %%F in ("%_INSTIDFILE%") do if %%~zF equ 0 del "%%F"
-IF NOT EXIST %_INSTIDFILE% (
-  ECHO Es laeuft keine %APP_NAME% Server Instanz!
-  ECHO Kommando kann nicht ausgefuehrt werden.
-  ECHO Bitte erst eine Instanz starten.
-  EXIT /b 1
-)
-SET /P _INSTANCEID=<%TEMPDIR%%_INSTIDFILE%
+REM SET _SERVER_COMMAND=bash -c docker exec -t base-container %_SERVER_COMMAND% ^| grep -v '[DEBUG]' 
+SET _SERVER_COMMAND=docker exec -t base-container %_SERVER_COMMAND% ^| grep -Fv '[DEBUG]' ^|^| true
+REM Attention wenn using variable _SERVER_COMMAND the pipe must be escaped 
+REM this way %_SERVER_COMMAND:|=^|%
 
 REM Send command.
 REM %AWS_BIN% --region %REGION% ssm send-command --instance-ids %_INSTANCEID% --document-name "AWS-RunShellScript" --parameters commands="%_SERVER_COMMAND%" --output text --query Command.CommandId > %TEMPDIR%commandid.txt
-
+REM SET _SERVER_COMMAND=echo 2 ^| cat 
+REM When using "CALL aws" in %AWS_BIN%, then the ^ symbols (caret) must be tripled and other special
+REM chracters must be excaped using a ^.
+REM ECHO %_SERVER_COMMAND:|=^|%
 %AWS_BIN% --region %REGION% ssm send-command --instance-ids %_INSTANCEID% ^
   --document-name "AWS-RunShellScript" ^
-  --parameters "{\"commands\":[\"%_SERVER_COMMAND%\"]}" ^
+  --parameters "{\"commands\":[\"%_SERVER_COMMAND:|=^|%\"]}" ^
+  --output text ^
   --query Command.CommandId > %TEMPDIR%commandid.txt
 
 SET /P COMMANDID=<%TEMPDIR%commandid.txt
 
+IF NOT DEFINED COMMANDID (
+	ECHO ^[ERROR^] aws ssm send-command failed.
+	EXIT /B 1
+)
 REM Wait till command execution terminates.
 :CMD_EXECUTION
 %AWS_BIN% --region %REGION% ssm list-command-invocations --command-id "%COMMANDID%" ^
@@ -75,7 +87,7 @@ REM Wait till command execution terminates.
   --output text > %TEMPDIR%cmd_status.txt
 SET /P status=<%TEMPDIR%cmd_status.txt
 IF [%STATUS%]==[InProgress] (
-	TIMEOUT /T 1 /NOBREAK > %TEMPDIR%nul
+	TIMEOUT /T 1 /NOBREAK > nul
 	GOTO CMD_EXECUTION
 )
 
@@ -87,7 +99,7 @@ IF [%STATUS%] == "Success" (
 ) ELSE (
 	%AWS_BIN% --region %REGION% ssm list-command-invocations --command-id "%COMMANDID%" ^
 	  --detail --query CommandInvocations[*].CommandPlugins[*].Output ^
-	  --output text		
+	  --output text	
 )
 
 REM Restore previous current directory.

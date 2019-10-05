@@ -2,6 +2,8 @@
 REM Batch file to launch EC2 instance with Minecraft Server for running docker app.
 SETLOCAL enabledelayedexpansion
 
+SET _TIME_START=%TIME%
+
 REM Remember previous current directory.
 SET EXCURRENTDIR=%CD%
 
@@ -23,13 +25,15 @@ IF ERRORLEVEL 1 (
   EXIT /B 1
   )
 
-echo Warte auf Ende der App Installation.
-TIMEOUT /T 10 /NOBREAK > nul
+REM ECHO Waiting for end of app installation.
+TIMEOUT /T 5 /NOBREAK > nul
 
 REM Run map.
-cfmc_runmap.bat %_CONFIG%
+CALL cfmc_runmap.bat %_CONFIG% NOPAUSE
 
 REM Restore previous current directory.
 CD /D %EXCURRENTDIR%
+ECHO Start time %_TIME_START%
+ECHO End time   %TIME%
 
 PAUSE
