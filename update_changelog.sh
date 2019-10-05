@@ -40,7 +40,7 @@ if ! _output="$(git status --porcelain)" || [ ! -z "$_output" ] ; then
     exit 1
 fi
 # Ensure a clean git index.
-if "$(git diff --cached --exit-code)" ; then
+if $(git diff --cached --exit-code) ; then
     echo "git workspace ist not clean. Please commit or re-checkout."
     show_usage
     exit 1
