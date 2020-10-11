@@ -18,6 +18,10 @@
                 "t2.small",
                 "t2.medium",
                 "t2.large",
+                "t3a.micro",
+                "t3a.small",
+                "t3a.medium",
+                "t3a.large",
                 "m1.small",
                 "m1.medium",
                 "m1.large",
@@ -207,6 +211,18 @@
                 "Arch": "HVM64"
             },
             "t2.large": {
+                "Arch": "HVM64"
+            },
+            "t3a.micro": {
+                "Arch": "HVM64"
+            },
+            "t3a.small": {
+                "Arch": "HVM64"
+            },
+            "t3a.medium": {
+                "Arch": "HVM64"
+            },
+            "t3a.large": {
                 "Arch": "HVM64"
             },
             "m1.small": {

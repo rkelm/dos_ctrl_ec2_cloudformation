@@ -37,6 +37,8 @@ should be connected to the three new policies.
 
 * Replace old values for AMIs with current Amzn Linux 2 AMI Ids.
 
+* Change IAM permissions for runner. The valid ec2 instance sizes should be configured there. 
+Otherwise the run_template.json can easily be edited to surpass size limitations.
 
 * create docs directory
 	- Add picture of stop workflow.
