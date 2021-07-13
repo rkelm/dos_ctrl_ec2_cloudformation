@@ -1,3 +1,4 @@
+Removed oversized and expensive instance types from cf template run_template.json.
 Added index.html example file to provide links to overviewer generated maps.
 
 v0.2

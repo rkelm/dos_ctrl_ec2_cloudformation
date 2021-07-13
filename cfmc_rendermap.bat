@@ -57,14 +57,14 @@ IF NOT DEFINED URL_MAP_ID_FILE (
 	EXIT /b 1
 )
 
-%CURL_BIN% %CURL_OPTIONS% -s %URL_MAP_ID_FILE%  > %TEMPDIR%map_ids.txt
+%CURL_BIN% %CURL_OPTIONS% -s %URL_MAP_ID_FILE%  > map_ids.txt
 IF ERRORLEVEL 1 (
   ECHO Konnte die Map-Liste nicht von %URL_MAP_ID_FILE% laden.
   PAUSE
   EXIT /B 1
 )
 
-SET /P list=<%TEMPDIR%map_ids.txt
+SET /P list=<map_ids.txt
 
 
 :SHOWMENU
@@ -111,36 +111,33 @@ SET _BATCH_RENDER_JOB_NAME=%BATCH_RENDER_JOB_NAME%_%_map_id%
 
 REM Get name of render job definition.
 %AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Prepared ^
-  --query Stacks[0].Outputs[?ExportName=='MCRenderJobDefinition-%_CONFIG%'].OutputValue --output text > %TEMPDIR%renderjobdef.txt
-SET /P _BATCH_RENDER_JOB_DEFINITION=<%TEMPDIR%renderjobdef.txt
+  --query Stacks[0].Outputs[?ExportName=='MCRenderJobDefinition-%_CONFIG%'].OutputValue --output text > renderjobdef.txt
+SET /P _BATCH_RENDER_JOB_DEFINITION=<renderjobdef.txt
 
 REM Get name of render job queue.
 %AWS_BIN% --region %REGION% cloudformation describe-stacks --stack-name %STACKNAME%-Prepared ^
-  --query Stacks[0].Outputs[?ExportName=='MCRenderJobQueue-%_CONFIG%'].OutputValue --output text > %TEMPDIR%renderjobqueue.txt
-SET /P _BATCH_RENDER_JOB_QUEUE=<%TEMPDIR%renderjobqueue.txt
+  --query Stacks[0].Outputs[?ExportName=='MCRenderJobQueue-%_CONFIG%'].OutputValue --output text > renderjobqueue.txt
+SET /P _BATCH_RENDER_JOB_QUEUE=<renderjobqueue.txt
 
 REM *** Create AWS Batch Job.
-aws batch submit-job --region %REGION% ^
-					 --job-name %_BATCH_RENDER_JOB_NAME% ^
+%AWS_BIN% --region %REGION% batch submit-job --job-name %_BATCH_RENDER_JOB_NAME% ^
                      --job-queue %_BATCH_RENDER_JOB_QUEUE% ^
                      --job-definition %_BATCH_RENDER_JOB_DEFINITION%  ^
 					 --container-overrides "command=render_map.sh,%_map_id%" ^
-					 --query "jobId" --output text > %TEMPDIR%job_id.txt
+					 --query "jobId" --output text > job_id.txt
+
 REM --parameters KeyName1=string,KeyName2=string
+
+SET /P _JOBID=<job_id.txt
 
 REM *** Show success or failure message.
 IF NOT ERRORLEVEL 1 (
 	ECHO Batch Job %_BATCH_RENDER_JOB_NAME% mit JobId %_JOBID% erstellt.
 ) ELSE (
 	ECHO Batch Job Erstellung fehlgeschlagen.
-	GOTO END
 )
-
-SET /P _JOBID=<%TEMPDIR%job_id.txt
-
 
 ECHO Aktualisierung der Karte %_map_id% gestartet. Das kann bis zu 30 Minuten dauern.
 ECHO Das Ergebnis kann spaeter unter %URL_MAP_OVERVIEW% eingesehen werden.
 
-:END
 PAUSE
