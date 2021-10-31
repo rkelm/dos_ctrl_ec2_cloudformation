@@ -1,5 +1,8 @@
 ﻿# To-Do:
 
+* Bug: When changing worlds, the log of the new world is not shown in CloudWatch.
+* Feature: Sync Cloudformation start/end logs to a Cloudwatch log.
+
 * Commit & Push
 * Release and test on other clients.
 	- Is "CALL aws" in AWS_BIN config parameter necessary?
