@@ -35,6 +35,7 @@
                 "m4.4xlarge",
                 "m4.10xlarge",
                 "m5a.large",
+                "m6a.large",
                 "c1.medium",
                 "c1.xlarge",
                 "c3.large",
@@ -258,6 +259,9 @@
                 "Arch": "HVM64"
             },
             "m5a.large": {
+                "Arch": "HVM64"
+            },
+            "m6a.large": {
                 "Arch": "HVM64"
             },
             "c1.medium": {
